@@ -1,0 +1,160 @@
+// ==UserScript==
+// @name         Scanner Banner Beta (script storage version)
+// @version      1.0
+// @description  Creates a banner to store your favorite barcodes
+// @author       brausean
+// @match        https://*/*
+// @match        http://*/*
+// @grant        GM_listValues
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_deleteValue
+// @grant        GM_addValueChangeListener
+// @require      https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    let barcodes = [];
+    let bannerState = sessionStorage.getItem("canSeeBanner");
+
+
+    // Create the button element
+    var bannerButton = document.createElement('button');
+    bannerButton.innerHTML = 'Scanner Banner';
+    bannerButton.style.position = 'fixed';
+    bannerButton.style.top = '0';
+    bannerButton.style.left = '0';
+    bannerButton.style.zIndex = '9999';
+    document.body.appendChild(bannerButton);
+
+     // Create the button element
+    var clearAllButton = document.createElement('button');
+    clearAllButton.innerHTML = 'Clear All';
+    clearAllButton.style.display = 'none';
+    clearAllButton.style.position = 'fixed';
+    clearAllButton.style.top = '0';
+    clearAllButton.style.left = '140px';
+    clearAllButton.style.zIndex = '9999';
+    document.body.appendChild(clearAllButton);
+
+    // Create the dropdown menu
+    var dropdown = document.createElement('div');
+    dropdown.style.display = 'none';
+    dropdown.style.position = 'fixed';
+    dropdown.style.backgroundColor = 'rgba(0, 0, 128, 0.5)';
+    dropdown.style.top = '30px';
+    dropdown.style.left = '0';
+    dropdown.style.zIndex = '9999';
+    dropdown.classList.add("container");
+    dropdown.insertAdjacentHTML("afterbegin", '<input type="text" id="newBarcode" placeholder="Type barcode. Press Enter." style="width: 195px; margin: 3px">');
+    document.body.appendChild(dropdown);
+
+    //create barcode with delete button. saves to local storage
+    function addBarcode(text) {
+        dropdown.insertAdjacentHTML("beforeend", `
+        <div id="barBox-${text}" class="my-element" style='margin: 3px'>
+         <svg id="${text}" class="barcode-svg" jsbarcode-value="${text}" jsbarcode-margin="6" jsbarcode-height="25px" jsbarcode-width="1"></svg>
+         <button id="delB-${text}" style="float: left; margin: 2px">Delete</button>
+        </div>`);
+        JsBarcode(".barcode-svg").init();
+        var deleteButton = document.getElementById(`delB-${text}`);
+        deleteButton.addEventListener('click', function() {
+            removeBarcode("barBox-" + text);
+            let barDex = barcodes.indexOf(text);
+            if (barDex !== -1) {
+                barcodes.splice(barDex, 1);
+                GM_setValue("savedArray", barcodes);
+                console.log('Deleted from script storage.');
+            }
+        });
+        //creates a blur listener on click
+        var blurMe = document.getElementById(text);
+        blurMe.addEventListener('click', function() {
+            blurMe.style.filter = (blurMe.style.filter !== 'blur(5px)') ? 'blur(5px)' : 'none'
+        });
+        //adds barcodes text to the barcodes array
+        barcodes.push(`${text}`);
+        GM_setValue("savedArray", barcodes);
+        console.log(barcodes + ' saved to script storage. Saved Barcodes: ' + GM_listValues());
+        // Add a listener for changes to the "savedTab" key
+        var listenerId = GM_addValueChangeListener("savedArray", function(key, oldValue, newValue, remote) {
+        // Print a message to the console when the value of the "savedTab" key changes
+        console.log("The value of the '" + key + "' key has changed from '" + oldValue + "' to '" + newValue + "'");
+        });
+        listenerId;
+    };
+
+    // Load saved barcodes
+    var savedBarcodes = GM_getValue("savedArray", null);
+    if (savedBarcodes!== null && savedBarcodes !== "") {
+        savedBarcodes.forEach(function(barcode) {
+            addBarcode(barcode);
+            console.log('Loaded ' + barcode);
+        });
+    }
+
+
+    //Handle user input for barcode creation
+    function saveInput () {
+        var userInput = document.getElementById("newBarcode").value;
+        return userInput;
+    };
+
+    //Remove barcode when delete button is clicked
+    function removeBarcode(barcodeId) {
+    var barcode = document.getElementById(barcodeId);
+    barcode.parentNode.removeChild(barcode);
+    };
+
+    //remembers if the banner is open or closed on page reload
+    dropdown.style.display = (bannerState === "block") ? "block" : "none";
+    clearAllButton.style.display = (bannerState === "block") ? "block" : "none";
+
+    // Show/Hide the banner on button click
+    bannerButton.addEventListener('click', function() {
+        if (dropdown.style.display === 'none') {
+            dropdown.style.display = 'block';
+            clearAllButton.style.display = 'block';
+            bannerState = 'block';
+            sessionStorage.setItem("canSeeBanner", bannerState);
+            console.log(bannerState);
+        } else {
+            dropdown.style.display = 'none';
+            clearAllButton.style.display = 'none';
+            bannerState = 'none';
+            sessionStorage.setItem("canSeeBanner", bannerState);
+            console.log(bannerState);
+        }
+    });
+
+    //clear locally saved barcodes
+    clearAllButton.addEventListener('click', function() {
+        //reset array to empty
+        barcodes = [];
+        console.log(barcodes);
+        //remove local storage keys and their values
+        GM_deleteValue("savedArray");
+        console.log('Deleting all barcodes...');
+        // Select all barcodes in the banner
+        var barBoxes = document.querySelectorAll('[id*="barBox-"]');
+        // remove barcodes from banner
+        barBoxes.forEach(function(box) {
+            removeBarcode(box.getAttribute("id"));
+            console.log('Barcodes Removed');
+        });
+    });
+
+    //generates barcode upon enter keypress and resets input field
+    var listenForEnter = document.getElementById("newBarcode");
+    listenForEnter.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && newBarcode.value !== "") {
+      // do something when enter key is pressed
+      addBarcode(saveInput());
+      //clear input box
+      listenForEnter.value="";
+    }
+    });
+
+})();
