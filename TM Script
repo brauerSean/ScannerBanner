@@ -10,11 +10,53 @@
 // @grant        GM_getValue
 // @grant        GM_deleteValue
 // @grant        GM_addValueChangeListener
+// @grant        GM_addStyle
 // @require      https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js
 // ==/UserScript==
 
 (function() {
     'use strict';
+
+    var sbStyles = `
+    button#bannerButton {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+    }
+
+    button#clearAll {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 140px;
+        z-index: 9999;
+    }
+
+    button[id^="delB-"] {
+        float: left;
+        margin: 2px;
+    }
+
+    div#sbContainer {
+        display: none;
+        position: fixed;
+        background-color: rgba(0, 0, 128, 0.5);
+        top: 30px;
+        left: 0;
+        z-index: 9999;
+    }
+
+    div#sbContainer input[type="text"] {
+        width: 195px;
+        margin: 3px;
+    }
+
+    label#autoCopyLabel {
+        color: white;
+        font-family: Verdana;
+    `
+    GM_addStyle(sbStyles);
 
     let barcodes = [];
     let bannerState = sessionStorage.getItem("canSeeBanner");
@@ -23,40 +65,49 @@
     // Create the button element
     var bannerButton = document.createElement('button');
     bannerButton.innerHTML = 'Scanner Banner';
-    bannerButton.style.position = 'fixed';
-    bannerButton.style.top = '0';
-    bannerButton.style.left = '0';
-    bannerButton.style.zIndex = '9999';
+    bannerButton.setAttribute('id', 'bannerButton');
+    //bannerButton.style.position = 'fixed';
+    //bannerButton.style.top = '0';
+    //bannerButton.style.left = '0';
+    //bannerButton.style.zIndex = '9999';
     document.body.appendChild(bannerButton);
 
      // Create the button element
     var clearAllButton = document.createElement('button');
     clearAllButton.innerHTML = 'Clear All';
-    clearAllButton.style.display = 'none';
-    clearAllButton.style.position = 'fixed';
-    clearAllButton.style.top = '0';
-    clearAllButton.style.left = '140px';
-    clearAllButton.style.zIndex = '9999';
+    clearAllButton.setAttribute('id', 'clearAll');
+    //clearAllButton.style.display = 'none';
+    //clearAllButton.style.position = 'fixed';
+    //clearAllButton.style.top = '0';
+    //clearAllButton.style.left = '140px';
+    //clearAllButton.style.zIndex = '9999';
     document.body.appendChild(clearAllButton);
 
     // Create the dropdown menu
     var dropdown = document.createElement('div');
-    dropdown.style.display = 'none';
-    dropdown.style.position = 'fixed';
-    dropdown.style.backgroundColor = 'rgba(0, 0, 128, 0.5)';
-    dropdown.style.top = '30px';
-    dropdown.style.left = '0';
-    dropdown.style.zIndex = '9999';
-    dropdown.classList.add("container");
-    dropdown.insertAdjacentHTML("afterbegin", '<input type="text" id="newBarcode" placeholder="Type barcode. Press Enter." style="width: 195px; margin: 3px">');
+    //dropdown.style.display = 'none';
+    //dropdown.style.position = 'fixed';
+    //dropdown.style.backgroundColor = 'rgba(0, 0, 128, 0.5)';
+    //dropdown.style.top = '30px';
+    //dropdown.style.left = '0';
+    //dropdown.style.zIndex = '9999';
+    dropdown.setAttribute('id', "sbContainer");
+    //dropdown.classList.add("container");
+    dropdown.insertAdjacentHTML("afterbegin", '<input type="text" id="newBarcode" placeholder="Type barcode. Press Enter." style="width: 195px; margin: 3px"><br><label id="autoCopyLabel"><input type="checkbox" id="autoCopy"> Auto Copy</label>');
     document.body.appendChild(dropdown);
+
+    //check for duplicates and prevent them
+
+    //let barNodes = document.getElementsByClassName('my-element') || ;
+    //future code going here
+
 
     //create barcode with delete button. saves to local storage
     function addBarcode(text) {
         dropdown.insertAdjacentHTML("beforeend", `
         <div id="barBox-${text}" class="my-element" style='margin: 3px'>
          <svg id="${text}" class="barcode-svg" jsbarcode-value="${text}" jsbarcode-margin="6" jsbarcode-height="25px" jsbarcode-width="1"></svg>
-         <button id="delB-${text}" style="float: left; margin: 2px">Delete</button>
+         <button id="delB-${text}">Delete</button>
         </div>`);
         JsBarcode(".barcode-svg").init();
         var deleteButton = document.getElementById(`delB-${text}`);
@@ -95,8 +146,8 @@
         });
     }
 
+    console.log('Number of Elements: ' + dropdown.childElementCount);
 
-    //Handle user input for barcode creation
     function saveInput () {
         var userInput = document.getElementById("newBarcode").value;
         return userInput;
@@ -155,6 +206,22 @@
       //clear input box
       listenForEnter.value="";
     }
+    });
+
+    //save autoCopy preference
+    var autoCopyState = document.getElementById('autoCopy');
+
+    //create barcode when user selects text on the screen.
+    document.addEventListener('mouseup', function(event) {
+        if (autoCopyState.checked) {
+            let userSelectedText = window.getSelection().toString();
+            //copy text to clipboard automatically
+            navigator.clipboard.writeText(userSelectedText);
+            //deselect users selection to prevent addition event triggers
+            window.getSelection().removeAllRanges();
+            //checks to make sure user text is valid input
+            (userSelectedText) ? addBarcode(userSelectedText) : console.log("Not able to barcode");
+        } else {console.log("Auto Copy not enabled")};
     });
 
 })();
