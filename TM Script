@@ -60,56 +60,42 @@
 
     let barcodes = [];
     let bannerState = sessionStorage.getItem("canSeeBanner");
-
+    let blurState = [];
+    let autoCopyState = GM_getValue('autoCopyState');
+    //console.log(autoCopyState);
 
     // Create the button element
     var bannerButton = document.createElement('button');
     bannerButton.innerHTML = 'Scanner Banner';
     bannerButton.setAttribute('id', 'bannerButton');
-    //bannerButton.style.position = 'fixed';
-    //bannerButton.style.top = '0';
-    //bannerButton.style.left = '0';
-    //bannerButton.style.zIndex = '9999';
     document.body.appendChild(bannerButton);
 
      // Create the button element
     var clearAllButton = document.createElement('button');
     clearAllButton.innerHTML = 'Clear All';
     clearAllButton.setAttribute('id', 'clearAll');
-    //clearAllButton.style.display = 'none';
-    //clearAllButton.style.position = 'fixed';
-    //clearAllButton.style.top = '0';
-    //clearAllButton.style.left = '140px';
-    //clearAllButton.style.zIndex = '9999';
     document.body.appendChild(clearAllButton);
 
     // Create the dropdown menu
     var dropdown = document.createElement('div');
-    //dropdown.style.display = 'none';
-    //dropdown.style.position = 'fixed';
-    //dropdown.style.backgroundColor = 'rgba(0, 0, 128, 0.5)';
-    //dropdown.style.top = '30px';
-    //dropdown.style.left = '0';
-    //dropdown.style.zIndex = '9999';
     dropdown.setAttribute('id', "sbContainer");
-    //dropdown.classList.add("container");
     dropdown.insertAdjacentHTML("afterbegin", '<input type="text" id="newBarcode" placeholder="Type barcode. Press Enter." style="width: 195px; margin: 3px"><br><label id="autoCopyLabel"><input type="checkbox" id="autoCopy"> Auto Copy</label>');
     document.body.appendChild(dropdown);
-
-    //check for duplicates and prevent them
-
-    //let barNodes = document.getElementsByClassName('my-element') || ;
-    //future code going here
+    var autoCopyCB = document.getElementById('autoCopy');
+    autoCopyCB.checked = autoCopyState;
 
 
     //create barcode with delete button. saves to local storage
     function addBarcode(text) {
-        dropdown.insertAdjacentHTML("beforeend", `
+        let dupeTest = barcodes.indexOf(text)
+        if (dupeTest === -1) {
+            dropdown.insertAdjacentHTML("beforeend", `
         <div id="barBox-${text}" class="my-element" style='margin: 3px'>
          <svg id="${text}" class="barcode-svg" jsbarcode-value="${text}" jsbarcode-margin="6" jsbarcode-height="25px" jsbarcode-width="1"></svg>
          <button id="delB-${text}">Delete</button>
         </div>`);
         JsBarcode(".barcode-svg").init();
+        console.log(blurState);
         var deleteButton = document.getElementById(`delB-${text}`);
         deleteButton.addEventListener('click', function() {
             removeBarcode("barBox-" + text);
@@ -117,36 +103,62 @@
             if (barDex !== -1) {
                 barcodes.splice(barDex, 1);
                 GM_setValue("savedArray", barcodes);
-                console.log('Deleted from script storage.');
+                //console.log('Deleted from script storage.');
             }
         });
         //creates a blur listener on click
         var blurMe = document.getElementById(text);
         blurMe.addEventListener('click', function() {
             blurMe.style.filter = (blurMe.style.filter !== 'blur(5px)') ? 'blur(5px)' : 'none'
+            if (blurMe.style.filter === 'blur(5px)') {
+                blurState.push(text); // adding item to array for saving to script storage
+                GM_setValue('bluredCodes', blurState); //save array to storage
+                console.log('blurState array:');
+                console.log(blurState);
+                console.log('saved: ' + blurMe.style.filter);
+            }
+            else {
+                var index = blurState.indexOf(text);
+                if (index !== -1) {
+                    blurState.splice(index, 1);
+                    GM_setValue('bluredCodes', blurState);
+                    console.log(`removed ${text} from blurState`);
+                    console.log('blurState:');
+                    console.log(blurState);
+                    console.log(savedBlurs)///not changing SavedBlurs array where its loaded from on refresh
+                }
+            }
         });
+
         //adds barcodes text to the barcodes array
         barcodes.push(`${text}`);
         GM_setValue("savedArray", barcodes);
-        console.log(barcodes + ' saved to script storage. Saved Barcodes: ' + GM_listValues());
-        // Add a listener for changes to the "savedTab" key
-        var listenerId = GM_addValueChangeListener("savedArray", function(key, oldValue, newValue, remote) {
-        // Print a message to the console when the value of the "savedTab" key changes
-        console.log("The value of the '" + key + "' key has changed from '" + oldValue + "' to '" + newValue + "'");
-        });
-        listenerId;
+        } else {console.log('Barcode Already Exists')};
     };
 
     // Load saved barcodes
     var savedBarcodes = GM_getValue("savedArray", null);
+    let savedBlurs = GM_getValue('bluredCodes', []);
+    blurState = savedBlurs;
+    console.log('savedBlurs:');
+    console.log(savedBlurs);
+    console.log('blurState:');
+    console.log(blurState);
     if (savedBarcodes!== null && savedBarcodes !== "") {
         savedBarcodes.forEach(function(barcode) {
             addBarcode(barcode);
-            console.log('Loaded ' + barcode);
         });
+        savedBarcodes.forEach(function(barcode) {
+            if (savedBlurs.indexOf(barcode) !== -1) {
+                let blurItAgain = document.getElementById(`${barcode}`);
+                console.log(blurItAgain);
+                blurItAgain.style.filter = 'blur(5px)';
+                console.log('blurred code');
+            };
+        })
     }
 
-    console.log('Number of Elements: ' + dropdown.childElementCount);
+    // console.log('Number of Elements: ' + dropdown.childElementCount);
 
     function saveInput () {
         var userInput = document.getElementById("newBarcode").value;
@@ -186,8 +198,10 @@
         barcodes = [];
         console.log(barcodes);
         //remove local storage keys and their values
-        GM_deleteValue("savedArray");
-        console.log('Deleting all barcodes...');
+        GM_listValues().forEach(function(key) {
+            GM_deleteValue(key);
+        })
+        console.log('Deleting barcodes...');
         // Select all barcodes in the banner
         var barBoxes = document.querySelectorAll('[id*="barBox-"]');
         // remove barcodes from banner
@@ -209,19 +223,38 @@
     });
 
     //save autoCopy preference
-    var autoCopyState = document.getElementById('autoCopy');
+
+    autoCopyCB.addEventListener('click', function() {
+        autoCopyState = (autoCopyCB.checked === true) ? true : false;
+        GM_setValue('autoCopyState', autoCopyState);
+        console.log(`Saved: ${autoCopyState}`);
+    })
 
     //create barcode when user selects text on the screen.
     document.addEventListener('mouseup', function(event) {
-        if (autoCopyState.checked) {
-            let userSelectedText = window.getSelection().toString();
-            //copy text to clipboard automatically
-            navigator.clipboard.writeText(userSelectedText);
+        let userSelectedText = window.getSelection().toString();
+        if (autoCopyCB.checked) {
             //deselect users selection to prevent addition event triggers
             window.getSelection().removeAllRanges();
-            //checks to make sure user text is valid input
-            (userSelectedText) ? addBarcode(userSelectedText) : console.log("Not able to barcode");
-        } else {console.log("Auto Copy not enabled")};
+        };
+        (userSelectedText) ? addBarcode(userSelectedText) : console.log("Nothing to barcode");
     });
-
+    //confirm data keys being saved for each site visited
+    console.log('Keys Saved to script storage: ' + GM_listValues());
+    // Get all elements with the class 'barcode-svg'
+    let barcodeElements = document.getElementsByClassName('barcode-svg');
+     // Create a click listener for each barcode element
+    Array.from(barcodeElements).forEach(element => {
+       element.addEventListener('click', handleClick);
+    });
+     // Click event handler
+        function handleClick(event) {
+            GM_setValue('bluredCodes', blurState);
+      //GM_setValue('bluredCodes', savedBlurs)
+            console.log('Barcode element clicked:', event.target);
+            console.log('blurState');
+            console.log(blurState);
+            console.log('savedBlurs');
+            console.log(savedBlurs);
+    }
 })();
