@@ -58,6 +58,10 @@
     `
     GM_addStyle(sbStyles);
 
+
+
+
+
     let barcodes = [];
     let bannerState = sessionStorage.getItem("canSeeBanner");
     let blurState = [];
@@ -84,6 +88,16 @@
     var autoCopyCB = document.getElementById('autoCopy');
     autoCopyCB.checked = autoCopyState;
 
+    function blurIt(blarray) {
+        blarray.forEach(function(bl) {
+            if (barcodes.indexOf(bl) !== -1) {
+                let blurItAgain = document.getElementById(`${bl}`);
+                //console.log(blurItAgain);
+                blurItAgain.style.filter = 'blur(5px)';
+                //console.log('blurred code');
+
+        }})
+    }
 
     //create barcode with delete button. saves to local storage
     function addBarcode(text) {
@@ -94,8 +108,11 @@
          <svg id="${text}" class="barcode-svg" jsbarcode-value="${text}" jsbarcode-margin="6" jsbarcode-height="25px" jsbarcode-width="1"></svg>
          <button id="delB-${text}">Delete</button>
         </div>`);
-        JsBarcode(".barcode-svg").init();
         console.log(blurState);
+        //blur it function here
+        JsBarcode(".barcode-svg").init();
+        blurIt(blurState);
+      //  console.log(blurState);
         var deleteButton = document.getElementById(`delB-${text}`);
         deleteButton.addEventListener('click', function() {
             removeBarcode("barBox-" + text);
@@ -103,6 +120,7 @@
             if (barDex !== -1) {
                 barcodes.splice(barDex, 1);
                 GM_setValue("savedArray", barcodes);
+                console.log(barcodes);
                 //console.log('Deleted from script storage.');
             }
         });
@@ -113,19 +131,18 @@
             if (blurMe.style.filter === 'blur(5px)') {
                 blurState.push(text); // adding item to array for saving to script storage
                 GM_setValue('bluredCodes', blurState); //save array to storage
-                console.log('blurState array:');
-                console.log(blurState);
-                console.log('saved: ' + blurMe.style.filter);
+                //console.log('blurState array:');
+                //console.log(blurState);
+                //console.log('saved: ' + blurMe.style.filter);
             }
             else {
                 var index = blurState.indexOf(text);
                 if (index !== -1) {
                     blurState.splice(index, 1);
                     GM_setValue('bluredCodes', blurState);
-                    console.log(`removed ${text} from blurState`);
-                    console.log('blurState:');
-                    console.log(blurState);
-                    console.log(savedBlurs)///not changing SavedBlurs array where its loaded from on refresh
+                    //console.log(`removed ${text} from blurState`);
+                    //console.log('blurState:');
+                    //console.log(blurState);
                 }
             }
         });
@@ -136,29 +153,50 @@
         } else {console.log('Barcode Already Exists')};
     };
 
+    function loadBarcodes() {
+        console.log('loadBarcodes() running');
     // Load saved barcodes
     var savedBarcodes = GM_getValue("savedArray", null);
+    var secretSaved = savedBarcodes;
     let savedBlurs = GM_getValue('bluredCodes', []);
     blurState = savedBlurs;
-    console.log('savedBlurs:');
-    console.log(savedBlurs);
-    console.log('blurState:');
-    console.log(blurState);
-    if (savedBarcodes!== null && savedBarcodes !== "") {
-        savedBarcodes.forEach(function(barcode) {
+        clearAllButton.click();
+  //  console.log('savedBlurs:');
+  //  console.log(savedBlurs);
+  //  console.log('blurState:');
+  //  console.log(blurState);
+    if (secretSaved!== null && secretSaved !== "") {
+        secretSaved.forEach(function(barcode) {
             addBarcode(barcode);
         });
-        savedBarcodes.forEach(function(barcode) {
+        secretSaved.forEach(function(barcode) {
             if (savedBlurs.indexOf(barcode) !== -1) {
                 let blurItAgain = document.getElementById(`${barcode}`);
-                console.log(blurItAgain);
+                //console.log(blurItAgain);
                 blurItAgain.style.filter = 'blur(5px)';
-                console.log('blurred code');
+                //console.log('blurred code');
             };
         })
     }
+    };
+    loadBarcodes();
 
     // console.log('Number of Elements: ' + dropdown.childElementCount);
+    function handleTabChange(event) {
+      if (event.type === 'blur') {
+        // Tab is inactive
+        console.log('Tab is inactive');
+        loadBarcodes();
+        } else if (event.type === 'focus') {
+            // Tab is active
+            console.log('Tab is active');
+            loadBarcodes();
+            }
+    }
+
+        // Attach the event listeners to the window object
+    window.addEventListener('blur', handleTabChange);
+    window.addEventListener('focus', handleTabChange);
 
     function saveInput () {
         var userInput = document.getElementById("newBarcode").value;
@@ -197,10 +235,11 @@
         //reset array to empty
         barcodes = [];
         console.log(barcodes);
-        //remove local storage keys and their values
+        GM_deleteValue("savedArray");
+        /*//remove local storage keys and their values
         GM_listValues().forEach(function(key) {
             GM_deleteValue(key);
-        })
+        })*/
         console.log('Deleting barcodes...');
         // Select all barcodes in the banner
         var barBoxes = document.querySelectorAll('[id*="barBox-"]');
@@ -241,6 +280,7 @@
     });
     //confirm data keys being saved for each site visited
     console.log('Keys Saved to script storage: ' + GM_listValues());
+
     // Get all elements with the class 'barcode-svg'
     let barcodeElements = document.getElementsByClassName('barcode-svg');
      // Create a click listener for each barcode element
@@ -250,11 +290,8 @@
      // Click event handler
         function handleClick(event) {
             GM_setValue('bluredCodes', blurState);
-      //GM_setValue('bluredCodes', savedBlurs)
             console.log('Barcode element clicked:', event.target);
             console.log('blurState');
             console.log(blurState);
-            console.log('savedBlurs');
-            console.log(savedBlurs);
     }
 })();
