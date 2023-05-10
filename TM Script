@@ -19,6 +19,8 @@
 
     var sbStyles = `
     button#bannerButton {
+        background-color: #30363d;
+        color: white;
         position: fixed;
         top: 0;
         left: 0;
@@ -26,6 +28,8 @@
     }
 
     button#clearAll {
+        background-color: #30363d;
+        color: white;
         display: none;
         position: fixed;
         top: 0;
@@ -34,35 +38,68 @@
     }
 
     button[id^="delB-"] {
+        background-color: #30363d;
+        color: white;
         float: left;
         margin: 2px;
     }
 
     div#sbContainer {
+        overflow: auto;
+        height: 100vh;
         display: none;
         position: fixed;
-        background-color: rgba(0, 0, 128, 0.5);
+        background-color: rgba(48, 54, 61, .7);
         top: 30px;
         left: 0;
         z-index: 9999;
     }
 
-    div#sbContainer input[type="text"] {
-        width: 195px;
-        margin: 3px;
+    #sbContainer input[type="text"] {
+        background-color: #30363d;
+        color: white;
+        width: 200px;
     }
 
-    label#autoCopyLabel {
+    #autoCopyLabel {
         color: white;
         font-family: Verdana;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+
+    }
+
+    input[type="checkbox"]:before {
+      content: "OFF";
+      text-align: center;
+      display: inline-block;
+      width: 30px;
+      height: 18px;
+      line-height: 18px;
+      border: 1px solid #ccc;
+      background-color: #30363d;
+      margin: 3px;
+    }
+
+    input[type="checkbox"]:checked:before {
+      background-color: #808080;
+      color: black;
+      content: "ON";
+
+}
+
     `
     GM_addStyle(sbStyles);
 
 
-
-
     let barcodes = [];
-    let bannerState = sessionStorage.getItem("canSeeBanner");
+    let bannerState = GM_getValue('canSeeBanner');
     let blurState = [];
     let autoCopyState = GM_getValue('autoCopyState');
     console.log(autoCopyState);
@@ -102,6 +139,7 @@
     function updateAutoCopyState() {
     autoCopyState = autoCopyCB.checked;
     GM_setValue('autoCopyState', autoCopyState);
+        GM_setValue('canSeeBanner', bannerState);
     }
 
     // Event listener for the checkbox change event
@@ -113,6 +151,9 @@
     window.addEventListener('focus', function() {
     autoCopyState = GM_getValue('autoCopyState');
     autoCopyCB.checked = autoCopyState;
+        bannerState = GM_getValue('canSeeBanner');
+        dropdown.style.display = bannerState;
+        clearAllButton.style.display = bannerState
     });
 
     window.addEventListener('blur', function() {
@@ -241,7 +282,6 @@
             // Tab is active
             console.log('Tab is active');
             loadBarcodes();
-
             }
     }
 
@@ -270,13 +310,13 @@
             dropdown.style.display = 'block';
             clearAllButton.style.display = 'block';
             bannerState = 'block';
-            sessionStorage.setItem("canSeeBanner", bannerState);
+            GM_setValue("canSeeBanner", bannerState);
             console.log(bannerState);
         } else {
             dropdown.style.display = 'none';
             clearAllButton.style.display = 'none';
             bannerState = 'none';
-            sessionStorage.setItem("canSeeBanner", bannerState);
+            GM_setValue("canSeeBanner", bannerState);
             console.log(bannerState);
         }
     });
@@ -318,8 +358,9 @@
         if (autoCopyCB.checked) {
             //deselect users selection to prevent addition event triggers
             window.getSelection().removeAllRanges();
+            (userSelectedText) ? addBarcode(userSelectedText) : console.log("Nothing to barcode")
         };
-        (userSelectedText) ? addBarcode(userSelectedText) : console.log("Nothing to barcode");
+       //Place ^^^ ternary here for always autoCopy function if auuto copy user choice is ever removed.
     });
     //confirm data keys being saved for each site visited
     console.log('Keys Saved to script storage: ' + GM_listValues());
