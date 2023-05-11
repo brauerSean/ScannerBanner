@@ -41,6 +41,9 @@
         background-color: #30363d;
         color: white;
         float: left;
+        width: 16px;
+        height: 16px;
+        line-height: 10px;
         margin: 2px;
     }
 
@@ -193,7 +196,7 @@
               jsbarcode-margin="6"
               jsbarcode-height="25px"
               jsbarcode-width="1"></svg>
-         <button id="delB-${text}">Delete</button>
+         <button id="delB-${text}">X</button>
         </div>`);
         //blur it function here
         JsBarcode(".barcode-svg").init();
