@@ -18,6 +18,7 @@
     'use strict';
 
     var sbStyles = `
+
     button#bannerButton {
         background-color: #30363d;
         color: white;
@@ -33,29 +34,57 @@
         display: none;
         position: fixed;
         top: 0;
-        left: 140px;
+        left: 120px;
         z-index: 9999;
     }
 
-    button[id^="delB-"] {
-        background-color: #30363d;
-        color: white;
-        float: left;
-        width: 16px;
+    i[id^="delB-"] {
+        position: relative;
+        left: 13px;
+        bottom: 8px;
+        color: #30363d;
         height: 16px;
+        padding: 1px;
+        text-align: center;
         line-height: 10px;
-        margin: 2px;
+        z-index: 9999;
+
     }
 
-    div#sbContainer {
+    i[id^="delB-"]:hover {
+        color: red;
+    }
+
+    #sbContainer .my-element {
+        margin-bottom: 20px;
+        margin: 2
+        display: block;
+        text-align: center;
+
+    }
+
+    #sbContainer .barcodeLabel {
+        color: white;
+        font-size: 20px;
+        margin: 0px;
+
+    }
+
+    .barcode-svg {
+        position: relative;
+        right: 10px;
+    }
+
+    #sbContainer {
         overflow: auto;
         height: 100vh;
-        display: none;
+        display: block;
         position: fixed;
+        padding: 2px;
         background-color: rgba(48, 54, 61, .7);
         top: 30px;
         left: 0;
-        z-index: 9999;
+        z-index: 9998;
     }
 
     #sbContainer input[type="text"] {
@@ -75,12 +104,13 @@
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
+
     }
 
     input[type="checkbox"]:before {
       content: "OFF";
       text-align: center;
-      display: inline-block;
+      display: block;
       width: 30px;
       height: 18px;
       line-height: 18px;
@@ -93,14 +123,24 @@
       background-color: #808080;
       color: black;
       content: "ON";
+
 }
 
     `
     GM_addStyle(sbStyles);
+    GM_addStyle(`
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
+    `);
 
+    const keys = GM_listValues();
+
+    keys.forEach((key) => {
+      const value = GM_getValue(key);
+      console.log(`Key: ${key}, Value: ${value}`);
+    });
 
     let barcodes = [];
-    let bannerState = GM_getValue('canSeeBanner');
+    let bannerState = GM_getValue('canSeeBanner') || "block";
     let blurState = [];
     let autoCopyState = GM_getValue('autoCopyState');
     console.log(autoCopyState);
@@ -124,7 +164,7 @@
                                 <input type="text"
                                        id="newBarcode"
                                        placeholder="Type barcode. Press Enter."
-                                       style="width: 195px; margin: 3px">
+                                       style="width: 165px; margin: 3px">
                                 <br>
                                 <label id="autoCopyLabel">
                                 <input type="checkbox"
@@ -134,7 +174,6 @@
                                 `);
     document.body.appendChild(dropdown);
     var autoCopyCB = document.getElementById('autoCopy');
-    //autoCopyCB.checked = autoCopyState;
 
     // Function to handle updating autoCopyState
     function updateAutoCopyState() {
@@ -165,10 +204,7 @@
         blarray.forEach(function(bl) {
             if (barcodes.indexOf(bl) !== -1) {
                 let blurItAgain = document.getElementById(`${bl}`);
-                //console.log(blurItAgain);
                 blurItAgain.style.filter = 'blur(5px)';
-                //console.log('blurred code');
-
         }})
     }
 
@@ -188,20 +224,25 @@
         if (dupeTest === -1) {
             dropdown.insertAdjacentHTML("beforeend", `
         <div id="barBox-${text}"
-             class="my-element"
-             style='margin: 3px'>
+             class="my-element">
+             <p class="barcodeLabel">${text}</p>
+
+              <i class="fas fa-trash-alt" id="delB-${text}"></i>
          <svg id="${text}"
               class="barcode-svg"
+              jsbarcode-format="CODE128"
               jsbarcode-value="${text}"
-              jsbarcode-margin="6"
-              jsbarcode-height="25px"
+              jsbarcode-displayvalue="false"
+              jsbarcode-linecolor="#30363d"
+              jsbarcode-margin="3"
+              jsbarcode-marginleft="24"
+              jsbarcode-textmargin="0"
+              jsbarcode-height="20px"
               jsbarcode-width="1"></svg>
-         <button id="delB-${text}">X</button>
         </div>`);
-        //blur it function here
         JsBarcode(".barcode-svg").init();
         blurIt(blurState);
-      //  console.log(blurState);
+
         var deleteButton = document.getElementById(`delB-${text}`);
         deleteButton.addEventListener('click', function() {
             removeBarcode("barBox-" + text);
@@ -209,8 +250,6 @@
             if (barDex !== -1) {
                 barcodes.splice(barDex, 1);
                 GM_setValue("savedArray", barcodes);
-                console.log(barcodes);
-                //console.log('Deleted from script storage.');
             }
         });
         //creates a blur listener on click
@@ -220,18 +259,12 @@
             if (blurMe.style.filter === 'blur(5px)') {
                 blurState.push(text); // adding item to array for saving to script storage
                 GM_setValue('bluredCodes', blurState); //save array to storage
-                //console.log('blurState array:');
-                //console.log(blurState);
-                //console.log('saved: ' + blurMe.style.filter);
             }
             else {
                 var index = blurState.indexOf(text);
                 if (index !== -1) {
                     blurState.splice(index, 1);
                     GM_setValue('bluredCodes', blurState);
-                    //console.log(`removed ${text} from blurState`);
-                    //console.log('blurState:');
-                    //console.log(blurState);
                 }
             }
         });
@@ -250,13 +283,8 @@
     var secretSaved = savedBarcodes;
     let savedBlurs = GM_getValue('bluredCodes', []);
     blurState = savedBlurs;
-        tempClear();
-        console.log(blurState)
-  //  console.log('savedBlurs:');
-  //  console.log(savedBlurs);
-  //  console.log('blurState:');
-  //  console.log(blurState);
-    if (secretSaved!== null && secretSaved !== "") {
+    tempClear();
+      if (secretSaved!== null && secretSaved !== "") {
         secretSaved.forEach(function(barcode) {
             addBarcode(barcode);
         });
@@ -276,12 +304,10 @@
     function handleTabChange(event) {
       if (event.type === 'blur') {
         // Tab is inactive
-        console.log('Tab is inactive');
         loadBarcodes();
 
         } else if (event.type === 'focus') {
             // Tab is active
-            console.log('Tab is active');
             loadBarcodes();
             }
     }
@@ -312,13 +338,11 @@
             clearAllButton.style.display = 'block';
             bannerState = 'block';
             GM_setValue("canSeeBanner", bannerState);
-            console.log(bannerState);
         } else {
             dropdown.style.display = 'none';
             clearAllButton.style.display = 'none';
             bannerState = 'none';
             GM_setValue("canSeeBanner", bannerState);
-            console.log(bannerState);
         }
     });
 
@@ -326,19 +350,15 @@
     clearAllButton.addEventListener('click', function() {
         //reset array to empty
         barcodes = [];
-        console.log(barcodes);
-        //GM_deleteValue("savedArray");
         //remove local storage keys and their values
         GM_listValues().forEach(function(key) {
             GM_deleteValue(key);
         })
-        console.log('Deleting barcodes...');
         // Select all barcodes in the banner
         var barBoxes = document.querySelectorAll('[id*="barBox-"]');
         // remove barcodes from banner
         barBoxes.forEach(function(box) {
             removeBarcode(box.getAttribute("id"));
-            console.log('Barcodes Removed');
         });
     });
 
@@ -375,8 +395,5 @@
      // Click event handler
         function handleClick(event) {
             GM_setValue('bluredCodes', blurState);
-            console.log('Barcode element clicked:', event.target);
-            console.log('blurState');
-            console.log(blurState);
     }
 })();
