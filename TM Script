@@ -23,6 +23,7 @@
         background-color: #30363d;
         color: white;
         position: fixed;
+        border-radius: 5px;
         top: 0;
         left: 0;
         z-index: 9999;
@@ -33,6 +34,7 @@
         color: white;
         display: none;
         position: fixed;
+        border-radius: 5px;
         top: 0;
         left: 120px;
         z-index: 9999;
@@ -73,6 +75,7 @@
     .barcode-svg {
         position: relative;
         right: 10px;
+        border-radius: 5px;
     }
 
     #sbContainer {
@@ -80,6 +83,7 @@
         height: 100vh;
         display: block;
         position: fixed;
+        border-radius: 10px;
         padding: 2px;
         background-color: rgba(48, 54, 61, .7);
         top: 30px;
@@ -91,6 +95,7 @@
         background-color: #30363d;
         color: white;
         width: 200px;
+        border-radius: 5px;
     }
 
     #autoCopyLabel {
@@ -114,6 +119,7 @@
       width: 30px;
       height: 18px;
       line-height: 18px;
+      border-radius: 10px;
       border: 1px solid #ccc;
       background-color: #30363d;
       margin: 3px;
@@ -150,6 +156,16 @@
     bannerButton.innerHTML = 'Scanner Banner';
     bannerButton.setAttribute('id', 'bannerButton');
     document.body.appendChild(bannerButton);
+
+    document.addEventListener('keydown', function(event) {
+      // Check if the key combination is Ctrl+Shift+C
+      if (event.ctrlKey && event.shiftKey) {
+        event.preventDefault();
+          bannerButton.click();
+      }
+    });
+
+
 
      // Create the button element
     var clearAllButton = document.createElement('button');
