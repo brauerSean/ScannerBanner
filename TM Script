@@ -59,6 +59,7 @@
         background-color: #30363d;
         color: white;
         width: 200px;
+       
     }
 
     #autoCopyLabel {
