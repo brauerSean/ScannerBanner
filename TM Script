@@ -131,20 +131,21 @@
 
 
     const keys = GM_listValues();
-/*
+///*
     //log keys:values for debugging
     function letsTest() {
     keys.forEach((key) => {
       const value = GM_getValue(key);
       console.log(`Key: ${key}, Value: ${value}`);
     });}
-*/
+//*/
     let barcodes = [];
-    let bannerState = GM_getValue('canSeeBanner') || "block";
-    let keycodesVisible = GM_getValue('canSeeKeycodes') || 'grid';
+    let bannerState = GM_getValue('canSeeBanner', 'block');
+    let keycodesVisible = GM_getValue('canSeeKeycodes', 'grid');
     let blurState = [];
     let autoCopyState = GM_getValue('autoCopyState');
     let altNames = GM_getValue('nameChanges', {});
+    let userSavedBarcodes = GM_getValue('userSB', []);
 
 
 
@@ -161,12 +162,17 @@
       }
 
     });
-    // Create the dropdown menu
+    // Create keycode banner for keyboard key shortcuts
     var keycodes = document.createElement('div');
     keycodes.setAttribute('id', "keycodeContainer");
     keycodes.setAttribute('style', 'display: none; height: 70px;');
     keycodes.insertAdjacentHTML("afterbegin", `
+                                <div id='loadSave'>
+                                <button id='loadUSaved'>Load</button>
+                                <button id='saveUCodes'>Save</button>
                                 <h3 id='sbLogo'>ScannerBanner v1.5</h3>
+                                ??
+                                </div>
                                 <label class= "kclabels">
                                 Refresh<br>
                                 <img src="https://i.postimg.cc/wMz3NLfG/Refresh.jpg" width="50">
@@ -181,6 +187,12 @@
                                 </label>
                                 `);
     document.body.appendChild(keycodes);
+    const loadbutton = document.getElementById('loadUSaved');
+    loadbutton.addEventListener('click', function() {
+        userSavedBarcodes = GM_getValue('userSB');
+        loadBarcodeSet(userSavedBarcodes);
+    });
+    document.getElementById('saveUCodes').addEventListener('click', saveBarcodeSet);
 
     // Create the dropdown menu
     var dropdown = document.createElement('div');
@@ -198,6 +210,8 @@
                                 </label>
                                 <button id='clearAll'>Clear</button>`);
     document.body.appendChild(dropdown);
+
+
 
     // Grab the clear all button element
     var clearAllButton = document.getElementById('clearAll');
@@ -314,7 +328,7 @@
         //adds barcodes text to the barcodes array
         barcodes.push(`${text}`);
         GM_setValue("savedArray", barcodes);
-        } 
+        }
     };
 
     function loadBarcodes() {
@@ -351,6 +365,20 @@
             };
         });
     };
+    function saveBarcodeSet() {
+        userSavedBarcodes = barcodes;
+        GM_setValue('userSB', userSavedBarcodes);
+            console.log(userSavedBarcodes);
+    }
+    function loadBarcodeSet(a) {
+        console.log(barcodes);
+        if (barcodes.length > 0) {
+            tempClear();
+        } else console.log('Empty');
+        a.forEach(function(b){
+            addBarcode(b);
+        });
+    }
     function handleTabChange(event) {
       if (event.type === 'blur') {
         // Tab is inactive
@@ -416,10 +444,20 @@
             barcodes = [];
             blurState = [];
             altNames = {};
-        //remove local storage keys and their values
+        //remove all local storage keys and their values
+            /*
             GM_listValues().forEach(function(key) {
                 GM_deleteValue(key);
             })
+            */
+            letsTest();
+            GM_deleteValue('canSeeBanner');
+            GM_deleteValue('canSeeKeycodes');
+            GM_deleteValue('nameChanges');
+            GM_deleteValue('autoCopyState');
+            GM_deleteValue('savedArray');
+            GM_deleteValue('bluredCodes');
+            letsTest();
         // Select all barcodes in the banner
             var barBoxes = document.querySelectorAll('[id*="barBox-"]');
         // remove barcodes from banner
@@ -432,7 +470,7 @@
     //generates barcode upon enter keypress and resets input field
     var listenForEnter = document.getElementById("newBarcode");
     listenForEnter.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter' && newBarcode.value !== "") {
+    if (event.key === 'Enter' && this.value !== "") {
       // do something when enter key is pressed
       addBarcode(saveInput());
       //clear input box
