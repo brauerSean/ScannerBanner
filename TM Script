@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Scanner Banner Beta (script storage version)
-// @version      1.0
-// @description  Creates a banner to store your favorite barcodes
+// @name         Scanner Banner
+// @version      1.5
+// @description  Creates a banner to store your favorite barcodes. Ctrl + Shift shows/hides the banner
 // @author       brausean
 // @match        https://*/*
 // @match        http://*/*
@@ -11,6 +11,7 @@
 // @grant        GM_deleteValue
 // @grant        GM_addValueChangeListener
 // @grant        GM_addStyle
+// @noframes
 // @require      https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js
 // ==/UserScript==
 
@@ -20,23 +21,15 @@
     var sbStyles = `
 
     button#bannerButton {
-        background-color: #30363d;
-        color: white;
-        position: fixed;
-        border-radius: 5px;
-        top: 0;
-        left: 0;
-        z-index: 9999;
+        display: none;
     }
 
     button#clearAll {
         background-color: #30363d;
         color: white;
-        display: none;
-        position: fixed;
         border-radius: 5px;
-        top: 0;
-        left: 120px;
+        width: 25%;
+        margin: 2px;
         z-index: 9999;
     }
 
@@ -59,17 +52,17 @@
 
     #sbContainer .my-element {
         margin-bottom: 20px;
-        margin: 2
-        display: block;
         text-align: center;
-
     }
 
+    #sbContainer .my-element {
+        margin-bottom: 20px;
+        text-align: center;
+    }
     #sbContainer .barcodeLabel {
         color: white;
         font-size: 20px;
         margin: 0px;
-
     }
 
     .barcode-svg {
@@ -86,16 +79,18 @@
         border-radius: 10px;
         padding: 2px;
         background-color: rgba(48, 54, 61, .7);
-        top: 30px;
+        top: 0px;
         left: 0;
-        z-index: 9998;
+        z-index: 9997;
     }
 
     #sbContainer input[type="text"] {
         background-color: #30363d;
         color: white;
-        width: 200px;
+        width: 180px;
         border-radius: 5px;
+        text-align: center;
+        margin: 2px;
     }
 
     #autoCopyLabel {
@@ -105,73 +100,87 @@
         font-weight: bold;
     }
 
-    input[type="checkbox"] {
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
+    #keycodeContainer {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 5px;
+        position: fixed;
+        border-radius: 10px;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        z-index: 9998;
+        background-color: rgba(48, 54, 61, .7);
+    }
+    .kclabels {
+        color: white;
+        font-family: Verdana;
+        font-size: 12px;
 
     }
+    #sbLogo  {
+        position: relative;
+        top: 5px;
+        left: 20px;
 
-    input[type="checkbox"]:before {
-      content: "OFF";
-      text-align: center;
-      display: block;
-      width: 30px;
-      height: 18px;
-      line-height: 18px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      background-color: #30363d;
-      margin: 3px;
     }
-
-    input[type="checkbox"]:checked:before {
-      background-color: #808080;
-      color: black;
-      content: "ON";
-
-}
 
     `
     GM_addStyle(sbStyles);
-    GM_addStyle(`
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');
-    `);
+    GM_addStyle(`@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');`);
+
 
     const keys = GM_listValues();
-
+/*
+    //log keys:values for debugging
+    function letsTest() {
     keys.forEach((key) => {
       const value = GM_getValue(key);
       console.log(`Key: ${key}, Value: ${value}`);
-    });
-
+    });}
+*/
     let barcodes = [];
     let bannerState = GM_getValue('canSeeBanner') || "block";
+    let keycodesVisible = GM_getValue('canSeeKeycodes') || 'grid';
     let blurState = [];
     let autoCopyState = GM_getValue('autoCopyState');
-    console.log(autoCopyState);
+    let altNames = GM_getValue('nameChanges', {});
+
+
 
     // Create the button element
     var bannerButton = document.createElement('button');
-    bannerButton.innerHTML = 'Scanner Banner';
     bannerButton.setAttribute('id', 'bannerButton');
     document.body.appendChild(bannerButton);
 
     document.addEventListener('keydown', function(event) {
-      // Check if the key combination is Ctrl+Shift+C
-      if (event.ctrlKey && event.shiftKey) {
+      // Check if the key combination is Ctrl+Shift
+      if (event.ctrlKey && event.keyCode === 16) {
         event.preventDefault();
           bannerButton.click();
       }
+
     });
-
-
-
-     // Create the button element
-    var clearAllButton = document.createElement('button');
-    clearAllButton.innerHTML = 'Clear All';
-    clearAllButton.setAttribute('id', 'clearAll');
-    document.body.appendChild(clearAllButton);
+    // Create the dropdown menu
+    var keycodes = document.createElement('div');
+    keycodes.setAttribute('id', "keycodeContainer");
+    keycodes.setAttribute('style', 'display: none; height: 70px;');
+    keycodes.insertAdjacentHTML("afterbegin", `
+                                <h3 id='sbLogo'>ScannerBanner v1.5</h3>
+                                <label class= "kclabels">
+                                Refresh<br>
+                                <img src="https://i.postimg.cc/wMz3NLfG/Refresh.jpg" width="50">
+                                </label>
+                                <label class= "kclabels">
+                                Tab<br>
+                                <img src="https://i.postimg.cc/nV1h5swn/Tab.jpg" width="50">
+                                </label>
+                                <label class= "kclabels">
+                                Enter<br>
+                                <img src="https://i.postimg.cc/50TSW7tF/Enter.jpg" width="50">
+                                </label>
+                                `);
+    document.body.appendChild(keycodes);
 
     // Create the dropdown menu
     var dropdown = document.createElement('div');
@@ -179,41 +188,33 @@
     dropdown.insertAdjacentHTML("afterbegin", `
                                 <input type="text"
                                        id="newBarcode"
-                                       placeholder="Type barcode. Press Enter."
-                                       style="width: 165px; margin: 3px">
+                                       maxlength="30"
+                                       placeholder="Type barcode. Press Enter.">
                                 <br>
                                 <label id="autoCopyLabel">
                                 <input type="checkbox"
                                        id="autoCopy">
                                        Auto Copy
                                 </label>
-                                `);
+                                <button id='clearAll'>Clear</button>`);
     document.body.appendChild(dropdown);
+
+    // Grab the clear all button element
+    var clearAllButton = document.getElementById('clearAll');
+
+    // target checkbox and set current state
     var autoCopyCB = document.getElementById('autoCopy');
+    autoCopyCB.checked = autoCopyState;
 
     // Function to handle updating autoCopyState
     function updateAutoCopyState() {
-    autoCopyState = autoCopyCB.checked;
-    GM_setValue('autoCopyState', autoCopyState);
+        autoCopyState = autoCopyCB.checked;
+        GM_setValue('autoCopyState', autoCopyState);
         GM_setValue('canSeeBanner', bannerState);
-    }
-
-    // Event listener for the checkbox change event
-    autoCopyCB.addEventListener('change', function() {
-    updateAutoCopyState();
-    });
-
-    // Event listeners for the window focus and blur events
-    window.addEventListener('focus', function() {
-    autoCopyState = GM_getValue('autoCopyState');
-    autoCopyCB.checked = autoCopyState;
-        bannerState = GM_getValue('canSeeBanner');
-        dropdown.style.display = bannerState;
-        clearAllButton.style.display = bannerState
-    });
-
-    window.addEventListener('blur', function() {
-    updateAutoCopyState();
+        GM_setValue('canSeeKeycodes', keycodesVisible)}
+        // Event listener for the checkbox change event
+        autoCopyCB.addEventListener('change', function() {
+        updateAutoCopyState();
     });
 
     function blurIt(blarray) {
@@ -221,7 +222,8 @@
             if (barcodes.indexOf(bl) !== -1) {
                 let blurItAgain = document.getElementById(`${bl}`);
                 blurItAgain.style.filter = 'blur(5px)';
-        }})
+            }
+        })
     }
 
     function tempClear() {
@@ -230,7 +232,6 @@
         let grabAllCodes = document.querySelectorAll('[id*="barBox-"]');
         grabAllCodes.forEach(function(code) {
             removeBarcode(code.getAttribute("id"));
-            console.log('Barcode Temp removed');
         });
     }
 
@@ -239,12 +240,10 @@
         let dupeTest = barcodes.indexOf(text)
         if (dupeTest === -1) {
             dropdown.insertAdjacentHTML("beforeend", `
-        <div id="barBox-${text}"
-             class="my-element">
-             <p class="barcodeLabel">${text}</p>
-
-              <i class="fas fa-trash-alt" id="delB-${text}"></i>
-         <svg id="${text}"
+        <div id="barBox-${text}"class="my-element">
+             <p class="barcodeLabel" id="bl-${text}" hint="${text}">${text}</p>
+             <i class="fas fa-trash-alt" id="delB-${text}"></i>
+             <svg id="${text}"
               class="barcode-svg"
               jsbarcode-format="CODE128"
               jsbarcode-value="${text}"
@@ -261,6 +260,8 @@
 
         var deleteButton = document.getElementById(`delB-${text}`);
         deleteButton.addEventListener('click', function() {
+            delete altNames[`bl-${text}`];
+            if (blurMe.style.filter === 'blur(5px)') { updateBlur() };
             removeBarcode("barBox-" + text);
             let barDex = barcodes.indexOf(text);
             if (barDex !== -1) {
@@ -268,9 +269,30 @@
                 GM_setValue("savedArray", barcodes);
             }
         });
-        //creates a blur listener on click
+
+        let nameChange = (old) => {
+            try {
+                let newName = prompt("New Name: (30 character max)",`${text}`).trim();
+                newName = (newName === null || newName === '') ? old.innerText : newName;
+                //console.log('before: ', newName);
+                if (newName.length > 30) {newName = newName.substring(0, 30)}
+                //console.log('after: ', newName);
+                if (newName !== old.innerText) {
+                    altNames[old.id] = newName;
+                    GM_setValue('nameChanges', altNames);
+                    old.innerText = newName;
+                }
+            } catch (error) {
+                console.log(error);
+              }
+
+        };
+        document.getElementById(`bl-${text}`).addEventListener('click', function() {
+            nameChange(this);
+        });
+
         var blurMe = document.getElementById(text);
-        blurMe.addEventListener('click', function() {
+        function updateBlur() {
             blurMe.style.filter = (blurMe.style.filter !== 'blur(5px)') ? 'blur(5px)' : 'none'
             if (blurMe.style.filter === 'blur(5px)') {
                 blurState.push(text); // adding item to array for saving to script storage
@@ -282,49 +304,69 @@
                     blurState.splice(index, 1);
                     GM_setValue('bluredCodes', blurState);
                 }
-            }
+            }};
+
+        //creates a blur listener on click
+        blurMe.addEventListener('click', function() {
+            updateBlur();
         });
 
         //adds barcodes text to the barcodes array
         barcodes.push(`${text}`);
         GM_setValue("savedArray", barcodes);
-        } else {console.log('Barcode Already Exists')};
+        } 
     };
 
     function loadBarcodes() {
-        autoCopyCB.checked = autoCopyState;
-        console.log('loadBarcodes() running');
-    // Load saved barcodes
-    var savedBarcodes = GM_getValue("savedArray", null);
-    var secretSaved = savedBarcodes;
-    let savedBlurs = GM_getValue('bluredCodes', []);
-    blurState = savedBlurs;
-    tempClear();
-      if (secretSaved!== null && secretSaved !== "") {
-        secretSaved.forEach(function(barcode) {
-            addBarcode(barcode);
-        });
-        secretSaved.forEach(function(barcode) {
-            if (savedBlurs.indexOf(barcode) !== -1) {
-                let blurItAgain = document.getElementById(`${barcode}`);
-                //console.log(blurItAgain);
-                blurItAgain.style.filter = 'blur(5px)';
-                //console.log('blurred code');
-            };
-        })
-    }
+        // Load saved barcodes
+        var savedBarcodes = GM_getValue("savedArray", null);
+        var secretSaved = savedBarcodes;
+        let savedBlurs = GM_getValue('bluredCodes', []);
+        blurState = savedBlurs;
+        tempClear();
+        if (secretSaved!== null && secretSaved !== "") {
+            secretSaved.forEach(function(barcode) {
+                addBarcode(barcode);
+            });
+            secretSaved.forEach(function(barcode) {
+                if (savedBlurs.indexOf(barcode) !== -1) {
+                    let blurItAgain = document.getElementById(`${barcode}`);
+                    blurItAgain.style.filter = 'blur(5px)';
+                };
+            })
+        }
+        secretSaved = [];
+        renameBarcodes(barcodes);
     };
     loadBarcodes();
 
-    // console.log('Number of Elements: ' + dropdown.childElementCount);
+    function renameBarcodes(anArray) {
+        anArray.forEach((bc) => {
+            if(altNames){
+                if (`bl-${bc}` in altNames) {
+                    let bLabel = document.getElementById(`bl-${bc}`)
+                    let altName = altNames[`bl-${bc}`];
+                    bLabel.innerText = altName;
+                }
+            };
+        });
+    };
     function handleTabChange(event) {
       if (event.type === 'blur') {
         // Tab is inactive
-        loadBarcodes();
+        GM_setValue('nameChanges', altNames);
+        updateAutoCopyState();
 
         } else if (event.type === 'focus') {
             // Tab is active
+            altNames = GM_getValue('nameChanges')|| {};
             loadBarcodes();
+            autoCopyState = GM_getValue('autoCopyState');
+            autoCopyCB.checked = autoCopyState;
+            bannerState = GM_getValue('canSeeBanner');
+            dropdown.style.display = bannerState;
+            keycodesVisible = GM_getValue('canSeeKeycodes');
+            keycodes.style.display = keycodesVisible
             }
     }
 
@@ -345,37 +387,46 @@
 
     //remembers if the banner is open or closed on page reload
     dropdown.style.display = (bannerState === "block") ? "block" : "none";
-    clearAllButton.style.display = (bannerState === "block") ? "block" : "none";
+    keycodes.style.display = (keycodesVisible === "grid") ? "grid" : "none";
 
     // Show/Hide the banner on button click
     bannerButton.addEventListener('click', function() {
         if (dropdown.style.display === 'none') {
             dropdown.style.display = 'block';
-            clearAllButton.style.display = 'block';
+            keycodes.style.display = 'grid';
             bannerState = 'block';
+            keycodesVisible = 'grid';
             GM_setValue("canSeeBanner", bannerState);
+            GM_setValue("canSeeKeycodes", keycodesVisible);
         } else {
             dropdown.style.display = 'none';
-            clearAllButton.style.display = 'none';
+            keycodes.style.display = 'none';
             bannerState = 'none';
             GM_setValue("canSeeBanner", bannerState);
+            keycodesVisible = 'none';
+            GM_setValue("canSeeKeycodes", keycodesVisible);
         }
     });
 
     //clear locally saved barcodes
     clearAllButton.addEventListener('click', function() {
+        let conDelete = confirm('Delete all barcodes?');
+        if (conDelete) {
         //reset array to empty
-        barcodes = [];
+            barcodes = [];
+            blurState = [];
+            altNames = {};
         //remove local storage keys and their values
-        GM_listValues().forEach(function(key) {
-            GM_deleteValue(key);
-        })
+            GM_listValues().forEach(function(key) {
+                GM_deleteValue(key);
+            })
         // Select all barcodes in the banner
-        var barBoxes = document.querySelectorAll('[id*="barBox-"]');
+            var barBoxes = document.querySelectorAll('[id*="barBox-"]');
         // remove barcodes from banner
-        barBoxes.forEach(function(box) {
-            removeBarcode(box.getAttribute("id"));
-        });
+            barBoxes.forEach(function(box) {
+                removeBarcode(box.getAttribute("id"));
+            });
+        } else console.log('User cancelled action');
     });
 
     //generates barcode upon enter keypress and resets input field
@@ -385,7 +436,7 @@
       // do something when enter key is pressed
       addBarcode(saveInput());
       //clear input box
-      listenForEnter.value="";
+      this.value="";
     }
     });
 
@@ -395,12 +446,12 @@
         if (autoCopyCB.checked) {
             //deselect users selection to prevent addition event triggers
             window.getSelection().removeAllRanges();
-            (userSelectedText) ? addBarcode(userSelectedText) : console.log("Nothing to barcode")
+            if (userSelectedText) { addBarcode(userSelectedText) };
         };
        //Place ^^^ ternary here for always autoCopy function if auuto copy user choice is ever removed.
     });
     //confirm data keys being saved for each site visited
-    console.log('Keys Saved to script storage: ' + GM_listValues());
+   // console.log('Keys Saved to script storage: ' + GM_listValues());
 
     // Get all elements with the class 'barcode-svg'
     let barcodeElements = document.getElementsByClassName('barcode-svg');
