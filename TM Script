@@ -145,7 +145,8 @@
     let blurState = [];
     let autoCopyState = GM_getValue('autoCopyState');
     let altNames = GM_getValue('nameChanges', {});
-    let userSavedBarcodes = GM_getValue('userSB', []);
+    let userSavedBarcodes = GM_getValue('userSB', {});
+
 
 
 
@@ -169,6 +170,11 @@
     keycodes.insertAdjacentHTML("afterbegin", `
                                 <div id='loadSave'>
                                 <button id='loadUSaved'>Load</button>
+                                <select id="saveDropdown">
+                                  <option value="slot1">Slot 1</option>
+                                  <option value="slot2">Slot 2</option>
+                                  <option value="slot3">Slot 3</option>
+                                </select><br>
                                 <button id='saveUCodes'>Save</button>
                                 <h3 id='sbLogo'>ScannerBanner v1.5</h3>
                                 ??
@@ -188,11 +194,24 @@
                                 `);
     document.body.appendChild(keycodes);
     const loadbutton = document.getElementById('loadUSaved');
+    const saveButton = document.getElementById('saveUCodes');
+    const saveDropdown = document.getElementById('saveDropdown');
+    let selectedSlot = saveDropdown.value;
     loadbutton.addEventListener('click', function() {
         userSavedBarcodes = GM_getValue('userSB');
-        loadBarcodeSet(userSavedBarcodes);
+        selectedSlot = saveDropdown.value;
+        
+        loadBarcodeSet(userSavedBarcodes[selectedSlot])
+        // this or the function are/is going to need adjustment to deal with the param being an object now
+        //loadBarcodeSet(userSavedBarcodes);
     });
-    document.getElementById('saveUCodes').addEventListener('click', saveBarcodeSet);
+    saveButton.addEventListener('click', function() {
+        selectedSlot = saveDropdown.value;
+        console.log(selectedSlot);
+        userSavedBarcodes[selectedSlot] = barcodes;
+        GM_setValue('userSB', userSavedBarcodes);
+        console.log(userSavedBarcodes);
+    })
 
     // Create the dropdown menu
     var dropdown = document.createElement('div');
@@ -365,11 +384,6 @@
             };
         });
     };
-    function saveBarcodeSet() {
-        userSavedBarcodes = barcodes;
-        GM_setValue('userSB', userSavedBarcodes);
-            console.log(userSavedBarcodes);
-    }
     function loadBarcodeSet(a) {
         console.log(barcodes);
         if (barcodes.length > 0) {
@@ -445,12 +459,12 @@
             blurState = [];
             altNames = {};
         //remove all local storage keys and their values
-            /*
+            ///*
             GM_listValues().forEach(function(key) {
                 GM_deleteValue(key);
             })
-            */
-            letsTest();
+            //*/
+            //remove all storage but saved barcodes object
             GM_deleteValue('canSeeBanner');
             GM_deleteValue('canSeeKeycodes');
             GM_deleteValue('nameChanges');
