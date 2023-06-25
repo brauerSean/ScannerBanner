@@ -185,7 +185,7 @@
     keycodes.setAttribute('style', 'display: none; ');
     keycodes.setAttribute('class', (ddSide === 'flipSBL') ? 'flipKCL' : 'flipKCR')
     keycodes.insertAdjacentHTML("afterbegin", `
-                                <img src='https://placehold.co/100x60/orange/white'>
+                                <img src='https://placehold.co/150x45/grey/white'>
                                 <label class= "kclabels">
                                 Enter<br>
                                 <img src="https://i.postimg.cc/3J5Kn6Lg/enter-Key-Thin.png" class='kc' width="60">
