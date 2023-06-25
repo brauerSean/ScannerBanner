@@ -67,7 +67,7 @@
 
     #sbContainer {
         overflow: auto;
-        height: 100vh;
+        height: 92vh;
         display: block;
         position: fixed;
         top: 0px;
@@ -122,9 +122,6 @@
     }
 
     #mahlogah {
-        font: 20px
-        color: white;
-
     }
 
     `
@@ -185,7 +182,7 @@
     keycodes.setAttribute('style', 'display: none; ');
     keycodes.setAttribute('class', (ddSide === 'flipSBL') ? 'flipKCL' : 'flipKCR')
     keycodes.insertAdjacentHTML("afterbegin", `
-                                <img src='https://placehold.co/175x45/grey/white'>
+                                <img src='https://placehold.co/175x45/grey/white?text=Scanner+Banner' id='mahlogah'>
                                 <label class= "kclabels">
                                 Enter<br>
                                 <img src="https://i.postimg.cc/3J5Kn6Lg/enter-Key-Thin.png" class='kc' width="60">
