@@ -203,6 +203,7 @@
     document.body.appendChild(dropdown);
     const saveDropdown = document.getElementById('saveDropdown');
     let selectedSlot = saveDropdown.value;
+    saveDropdown.value = lastUsedSlot;
     saveDropdown.addEventListener('change', function() {
         userSavedBarcodes = GM_getValue('userSB');
         selectedSlot = saveDropdown.value;
