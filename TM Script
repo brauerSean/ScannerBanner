@@ -156,7 +156,7 @@
       }
 
     });
-    
+
     ddSide = GM_getValue('ddside')
     console.log(ddSide)
     // Create keycode banner for keyboard key shortcuts
@@ -227,9 +227,7 @@
         }
 
         GM_setValue('ddside', dropdown.getAttribute('class'));
-        console.log(`${GM_getValue('ddside')} and `)
         GM_setValue('kcside', keycodes.getAttribute('class'));
-        console.log(`${GM_getValue('kcside')}`)
     })
 
     // Grab the clear all button element
@@ -507,13 +505,11 @@
     document.addEventListener('keydown', function(event) {
         if (event.keyCode === 17) {
             acPressed = true;
-            console.log('pressed');
         }
     })
     document.addEventListener('keyup', function(event) {
         if (event.keyCode === 17) {
             acPressed = false;
-            console.log('unpressed');
         }
     })
     document.addEventListener('click', function(event) {
