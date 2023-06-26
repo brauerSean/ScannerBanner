@@ -1,19 +1,4 @@
-// ==UserScript==
-// @name         Scanner Banner
-// @version      1.5
-// @description  Creates a banner to store your favorite barcodes. 
-// @author       brausean
-// @match        https://*/*
-// @match        http://*/*
-// @grant        GM_listValues
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @grant        GM_deleteValue
-// @grant        GM_addValueChangeListener
-// @grant        GM_addStyle
-// @noframes
-// @require      https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js
-// ==/UserScript==
+
 
 (function() {
     'use strict';
@@ -146,7 +131,7 @@
     let userSavedBarcodes = GM_getValue('userSB');
     let ddSide = GM_getValue('ddside') || 'flipSBL';
     let kcSide = GM_getValue('kcside') || 'flipKCL';
-    console.log(`start: ${ddSide} and ${kcSide}`)
+    let lastUsedSlot = GM_getValue('lastusedslot') || 'slot1';
 
     //creates memory for storage
     if (userSavedBarcodes === undefined) {
@@ -225,6 +210,7 @@
     });
     function save() {
         selectedSlot = saveDropdown.value;
+        GM_setValue('lastusedslot', selectedSlot);
         userSavedBarcodes[selectedSlot] = barcodes;
         GM_setValue('userSB', userSavedBarcodes);
     }
