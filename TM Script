@@ -143,9 +143,6 @@
         GM_setValue('userSB', userSavedBarcodes);
     }
 
-
-
-
     // Create the button element
     var bannerButton = document.createElement('button')
     bannerButton.setAttribute('id', 'bannerButton');
@@ -159,6 +156,7 @@
       }
 
     });
+    
     ddSide = GM_getValue('ddside')
     console.log(ddSide)
     // Create keycode banner for keyboard key shortcuts
