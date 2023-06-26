@@ -404,6 +404,8 @@
             // Tab is active
             ddSide = GM_getValue('ddside');
             kcSide = GM_getValue('kcside');
+            lastUsedSlot = GM_getValue('lastusedslot');
+            saveDropdown.value = lastUsedSlot;
             console.log(`activeTab-currentValue ${ddSide} and ${kcSide}`);
             dropdown.setAttribute('class', ddSide);
             keycodes.setAttribute('class', kcSide);
