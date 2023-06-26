@@ -220,7 +220,6 @@
 
     flipButton.addEventListener('click', function() {
         dropdownClass = dropdown.getAttribute('class');
-        console.log(dropdownClass);
         if (dropdownClass === 'flipSBL') {
             dropdown.setAttribute('class', 'flipSBR');
             keycodes.setAttribute('class', 'flipKCR');
@@ -386,7 +385,6 @@
         });
     };
     function loadBarcodeSet(a) {
-        console.log(barcodes);
         if (barcodes.length > 0) {
             tempClear();
         } else console.log('Empty');
@@ -396,22 +394,18 @@
         renameBarcodes(barcodes);
     }
     function handleTabChange(event) {
-      console.log(event.type);
+      
       if (event.type === 'blur') {
         // Tab is inactive
         updateAutoCopyState();
-        console.log('UACS just ran');
-
         } else if (event.type === 'focus') {
             // Tab is active
             ddSide = GM_getValue('ddside');
             kcSide = GM_getValue('kcside');
             lastUsedSlot = GM_getValue('lastusedslot');
             saveDropdown.value = lastUsedSlot;
-            console.log(`activeTab-currentValue ${ddSide} and ${kcSide}`);
             dropdown.setAttribute('class', ddSide);
             keycodes.setAttribute('class', kcSide);
-            console.log(dropdown.getAttribute('class'));
             altNames = GM_getValue('nameChanges')|| {};
             loadBarcodes();
             bannerState = GM_getValue('canSeeBanner');
@@ -420,8 +414,7 @@
             keycodes.style.display = keycodesVisible
             }
     }
-
-        // Attach the event listeners to the window object
+    // Attach the event listeners to the window object
     window.addEventListener('blur', handleTabChange);
     window.addEventListener('focus', handleTabChange);
 
@@ -528,7 +521,6 @@
     document.addEventListener('click', function(event) {
         if (acPressed) {
             event.preventDefault();
-            console.log(event.target);
             addBarcode(event.target.innerHTML);
         }
     })
