@@ -158,7 +158,6 @@
     });
 
     ddSide = GM_getValue('ddside')
-    console.log(ddSide)
     // Create keycode banner for keyboard key shortcuts
     var keycodes = document.createElement('div');
     keycodes.setAttribute('id', "keycodeContainer");
