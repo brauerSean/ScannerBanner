@@ -1,6 +1,6 @@
-console.log('test updates: ')
 (function() {
     'use strict';
+    console.log('test updates: ')
 
     var sbStyles = `
 
