@@ -1,5 +1,4 @@
-
-
+console.log('test updates: ')
 (function() {
     'use strict';
 
