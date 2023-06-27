@@ -1,6 +1,7 @@
 (function() {
     'use strict';
-    console.log('test updates: here now')
+    
+    console.log('test updates: here now');
 
     var sbStyles = `
 
