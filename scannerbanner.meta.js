@@ -11,8 +11,8 @@
 // @grant        GM_deleteValue
 // @grant        GM_addValueChangeListener
 // @grant        GM_addStyle
-// @downloadURL   
-// @updateURL     
+// @downloadURL  https://raw.githubusercontent.com/brauerSean/ScannerBanner/main/scannerbanner.user.js
+// @updateURL    https://raw.githubusercontent.com/brauerSean/ScannerBanner/main/scannerbanner.meta.js   
 // @noframes
 // @require      https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js
 // @require      https://raw.githubusercontent.com/brauerSean/ScannerBanner/main/ScannerBanner.js
