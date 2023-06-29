@@ -1,7 +1,7 @@
 (function() {
     'use strict';
     
-    console.log('test updates: here now');
+    console.log('test updates: changed stuff');
 
     var sbStyles = `
 
@@ -128,11 +128,11 @@
     let keycodesVisible = GM_getValue('canSeeKeycodes', 'flex');
     let blurState = [];
     let altNames = GM_getValue('nameChanges', {});
-    let userSavedBarcodes = GM_getValue('userSB');
+    let userSavedBarcodes = GM_getValue('userSB') || {'slot1': [], 'slot2': [], 'slot3': []};
     let ddSide = GM_getValue('ddside') || 'flipSBL';
     let kcSide = GM_getValue('kcside') || 'flipKCL';
     let lastUsedSlot = GM_getValue('lastusedslot') || 'slot1';
-
+/*
     //creates memory for storage
     if (userSavedBarcodes === undefined) {
         userSavedBarcodes = {
@@ -142,7 +142,7 @@
         }
         GM_setValue('userSB', userSavedBarcodes);
     }
-
+*/
     // Create the button element
     var bannerButton = document.createElement('button')
     bannerButton.setAttribute('id', 'bannerButton');
