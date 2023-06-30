@@ -1,7 +1,7 @@
 (function() {
     'use strict';
     
-    console.log('test updates: changed back');
+    console.log('test updates: Hope is here');
 
     var sbStyles = `
 
@@ -240,6 +240,7 @@
         GM_setValue('kcside', keycodes.getAttribute('class'));
         GM_setValue('nameChanges', altNames);
         GM_setValue('lastusedslot', saveDropdown.value);
+        GM_setValue('userSB', userSavedBarcodes);
     }
 
 
