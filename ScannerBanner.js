@@ -152,7 +152,7 @@
       // Check if the key combination is Ctrl+Shift
       if (event.ctrlKey && event.altKey) {
         event.preventDefault();
-        shiftPageLeft()
+        shiftPageRight()
         bannerButton.click();
       }
 
