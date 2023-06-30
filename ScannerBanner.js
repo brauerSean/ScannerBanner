@@ -152,7 +152,8 @@
       // Check if the key combination is Ctrl+Shift
       if (event.ctrlKey && event.altKey) {
         event.preventDefault();
-          bannerButton.click();
+        shiftPageLeft()
+        bannerButton.click();
       }
 
     });
@@ -518,4 +519,14 @@
             addBarcode(event.target.innerHTML);
         }
     })
+    // Shifting the page to the left
+    function shiftPageLeft() {
+        window.scrollBy(-100, 0); // Adjust the scroll amount as needed
+    }
+  
+    // Shifting the page to the right
+    function shiftPageRight() {
+        window.scrollBy(100, 0); // Adjust the scroll amount as needed
+    }
+  
 })();
