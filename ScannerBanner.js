@@ -1,6 +1,7 @@
+
 (function() {
     'use strict';
-    
+
     console.log('test updates: shift');
 
     var sbStyles = `
@@ -78,6 +79,7 @@
         align-items: flex-start;
         position: fixed;
         bottom: 0;
+        left: 0;
         border-radius: 10px;
         width: 100%;
         z-index: 9998;
@@ -128,22 +130,8 @@
     let keycodesVisible = GM_getValue('canSeeKeycodes', 'flex');
     let blurState = [];
     let altNames = GM_getValue('nameChanges', {});
-    let userSavedBarcodes = GM_getValue('userSB');
     let ddSide = GM_getValue('ddside') || 'flipSBL';
     let kcSide = GM_getValue('kcside') || 'flipKCL';
-    let lastUsedSlot = GM_getValue('lastusedslot') || 'slot1';
-
-    //creates memory for storage
-    if (userSavedBarcodes === undefined) {
-        userSavedBarcodes = {
-            'slot1': [],
-            'slot2': [],
-            'slot3': []
-        }
-        GM_setValue('userSB', userSavedBarcodes);
-    }
-
-    // Create the button element
     var bannerButton = document.createElement('button')
     bannerButton.setAttribute('id', 'bannerButton');
     document.body.appendChild(bannerButton);
@@ -154,7 +142,6 @@
         event.preventDefault();
         bannerButton.click();
       }
-
     });
 
     ddSide = GM_getValue('ddside')
@@ -190,48 +177,42 @@
                                        maxlength="30"
                                        placeholder="Type barcode. Press Enter.">
                                 <br>
-                                <select id="saveDropdown" class="styleSaver">
-                                  <option value="slot1">Slot 1</option>
-                                  <option value="slot2">Slot 2</option>
-                                  <option value="slot3">Slot 3</option>
-                                </select>
                                 <button id='clearAll'>Clear</button>
                                 <button id='flip' class='styleSaver'>Flip</button>`);
     document.body.appendChild(dropdown);
-    const saveDropdown = document.getElementById('saveDropdown');
-    let selectedSlot = saveDropdown.value;
-    saveDropdown.value = lastUsedSlot;
-    saveDropdown.addEventListener('change', function() {
-        userSavedBarcodes = GM_getValue('userSB');
-        selectedSlot = saveDropdown.value;
-        loadBarcodeSet(userSavedBarcodes[selectedSlot])
-    });
-    function save() {
-        selectedSlot = saveDropdown.value;
-        GM_setValue('lastusedslot', selectedSlot);
-        userSavedBarcodes[selectedSlot] = barcodes;
-        GM_setValue('userSB', userSavedBarcodes);
-    }
+    console.log(dropdown.getAttribute('class'))
     let flipButton = document.getElementById('flip');
     let dropdownClass = dropdown.getAttribute('class');
-
+    if (bannerState === 'block') {
+        if (dropdownClass === 'flipSBL') {
+            shiftRight();
+        } else {shiftLeft()}
+    }
     flipButton.addEventListener('click', function() {
         dropdownClass = dropdown.getAttribute('class');
         if (dropdownClass === 'flipSBL') {
             dropdown.setAttribute('class', 'flipSBR');
             keycodes.setAttribute('class', 'flipKCR');
+            shiftLeft();
         } else {
             dropdown.setAttribute('class', 'flipSBL');
             keycodes.setAttribute('class', 'flipKCL');
+            shiftRight();
         }
 
         GM_setValue('ddside', dropdown.getAttribute('class'));
         GM_setValue('kcside', keycodes.getAttribute('class'));
     })
-
     // Grab the clear all button element
     var clearAllButton = document.getElementById('clearAll');
-
+    function shiftRight() {
+            document.body.style.marginLeft = `225px`;
+            document.body.style.marginRight = '0px';
+    }
+    function shiftLeft() {
+            document.body.style.marginRight = `225px`;
+            document.body.style.marginLeft = '0px';
+    }
        // Function to handle updating autoCopyState
     function updateAutoCopyState() {
         GM_setValue('canSeeBanner', bannerState);
@@ -239,8 +220,6 @@
         GM_setValue('ddside', dropdown.getAttribute('class'));
         GM_setValue('kcside', keycodes.getAttribute('class'));
         GM_setValue('nameChanges', altNames);
-        GM_setValue('lastusedslot', saveDropdown.value);
-        GM_setValue('userSB', userSavedBarcodes);
     }
 
 
@@ -294,7 +273,6 @@
             if (barDex !== -1) {
                 barcodes.splice(barDex, 1);
                 GM_setValue("savedArray", barcodes);
-                save();
             }
         });
 
@@ -342,7 +320,6 @@
         //adds barcodes text to the barcodes array
         barcodes.push(`${text}`);
         GM_setValue("savedArray", barcodes);
-        save();
         }
     };
 
@@ -390,7 +367,7 @@
         renameBarcodes(barcodes);
     }
     function handleTabChange(event) {
-      
+
       if (event.type === 'blur') {
         // Tab is inactive
         updateAutoCopyState();
@@ -398,8 +375,6 @@
             // Tab is active
             ddSide = GM_getValue('ddside');
             kcSide = GM_getValue('kcside');
-            lastUsedSlot = GM_getValue('lastusedslot');
-            saveDropdown.value = lastUsedSlot;
             dropdown.setAttribute('class', ddSide);
             keycodes.setAttribute('class', kcSide);
             altNames = GM_getValue('nameChanges')|| {};
@@ -440,10 +415,17 @@
             keycodesVisible = 'flex';
             GM_setValue("canSeeBanner", bannerState);
             GM_setValue("canSeeKeycodes", keycodesVisible);
+            if (dropdown.getAttribute('class') === 'flipSBL') {
+                shiftRight();
+            } else {
+                shiftLeft();
+            }
         } else {
             dropdown.style.display = 'none';
             keycodes.style.display = 'none';
             bannerState = 'none';
+            document.body.style.marginLeft = '0px'
+            document.body.style.marginRight = '0px'
             GM_setValue("canSeeBanner", bannerState);
             keycodesVisible = 'none';
             GM_setValue("canSeeKeycodes", keycodesVisible);
@@ -476,7 +458,6 @@
             barBoxes.forEach(function(box) {
                 removeBarcode(box.getAttribute("id"));
             });
-            save();
         } else console.log('User cancelled action');
     });
 
