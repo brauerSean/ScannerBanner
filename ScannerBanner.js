@@ -2,7 +2,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: shift');
+    console.log('test updates: margin buttons, hover effects');
 
     var sbStyles = `
 
@@ -108,7 +108,12 @@
 
     }
 
-    #mahlogah {
+    button[id^="incSpace"], [id^="deSpace"] {
+        background: none;
+        border: none;
+        color: white;
+        position: relative;
+        bottom: 10px;
     }
 
     `
@@ -246,9 +251,9 @@
         let dupeTest = barcodes.indexOf(text)
         if (dupeTest === -1 && text.length <= 30 && text !== '') {
             dropdown.insertAdjacentHTML("beforeend", `
-        <div id="barBox-${text}"class="bContainer">
+        <div id="barBox-${text}"class="bContainer" title="${text}">
              <p class="barcodeLabel" id="bl-${text}" hint="${text}">${text}</p>
-             <div><i class="fas fa-trash-alt" id="delB-${text}"></i>
+             <div><button id='deSpace${text}'>-</button><i class="fas fa-trash-alt" id="delB-${text}"></i>
              <svg id="${text}"
               class="barcode-svg"
               jsbarcode-format="CODE128"
@@ -259,7 +264,8 @@
               jsbarcode-marginleft="24"
               jsbarcode-textmargin="0"
               jsbarcode-height="20px"
-              jsbarcode-width="1"></svg><div>
+              jsbarcode-width="1"></svg>
+              <button id='incSpace${text}'>+</button><div>
         </div>`);
         JsBarcode(".barcode-svg").init();
         blurIt(blurState);
@@ -275,7 +281,6 @@
                 GM_setValue("savedArray", barcodes);
             }
         });
-
         let nameChange = (old) => {
             try {
                 let newName = prompt("New Name: (30 character max)",`${text}`).trim();
@@ -295,6 +300,12 @@
         };
         document.getElementById(`bl-${text}`).addEventListener('click', function() {
             nameChange(this);
+        });
+        document.getElementById(`incSpace${text}`).addEventListener('click', function() {
+            document.getElementById(`barBox-${text}`).style.marginBottom = "75px"
+        });
+        document.getElementById(`deSpace${text}`).addEventListener('click', function() {
+            document.getElementById(`barBox-${text}`).style.marginBottom = "35px";
         });
 
         var blurMe = document.getElementById(text);
