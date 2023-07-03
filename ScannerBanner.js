@@ -1,4 +1,3 @@
-
 (function() {
     'use strict';
 
@@ -9,64 +8,74 @@
     button#bannerButton {
         display: none;
     }
-
-    button#clearAll, .styleSaver {
-        background-color: #30363d;
+    .ctrlPanel {
         color: white;
+        font-size: 2vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .styleSaver {
+        background: #30363d;
+        color: white;
+        border: none;
         border-radius: 5px;
         margin: 2px;
         z-index: 9999;
+        width: 10vw;
+        height: auto;
 
     }
 
     i[id^="delB-"] {
         color: #30363d;
-        height: 16px;
-        padding: 1px;
+        padding: 5px;
         z-index: 9999;
-        position: relative;
-        bottom: 8px;
-        left: 15px;
     }
 
     i[id^="delB-"]:hover {
         color: red;
     }
     #sbContainer .bContainer {
-        margin: 0px 0px 20px 0px;
+        margin: 0px 0px 5px 0px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
     }
-    #sbContainer .barcodeLabel {
+    .barcodeLabel {
         color: white;
-        font-size: 20px;
-        margin: 0px;
+        font-size: 3vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
     }
-
     .barcode-svg {
-        position: relative;
-        right: 8px;
         border-radius: 2px;
+        height: 4vh;
+        width: auto;
     }
 
     #sbContainer {
         overflow: auto;
-        height: 92vh;
+        height: 100vh;
+        width: 20vw;
         display: block;
         position: fixed;
         top: 0px;
-        border-radius: 10px;
         padding: 2px;
         background-color: rgba(48, 54, 61, .7);
-        z-index: 9997;
+        z-index: 9998;
     }
 
     #sbContainer input[type="text"] {
         background-color: #30363d;
         color: white;
-        width: 96%;
+        width: 20vw;
+        height: auto;
+        border: none;
         border-radius: 5px;
         text-align: center;
         margin: 2px auto;
@@ -74,25 +83,34 @@
 
     #keycodeContainer {
         display: flex;
-        //flex-direction: row;
-        justify-content: space-around;
+        justify-content: space-evenly;
         align-items: flex-start;
         position: fixed;
         bottom: 0;
         left: 0;
-        border-radius: 10px;
-        width: 100%;
-        z-index: 9998;
+        height: 8vh;
+        width: 100vw;
+        z-index: 9997;
         background-color: rgba(48, 54, 61, .7);
+    }
+    .fixedSize {
+        width: 150vh;
+    }
+    #mahlogah {
+        width: 100%;
+        height: 8vh;
     }
     .kclabels {
         color: white;
         font-family: Verdana;
-        font-size: 12px;
+        font-size: 2vh;
         text-align: center;
+        width: 100%;
     }
     .kc {
-        margin: 0px 120px;
+        flex: 1;
+        padding: 5px;
+        width: 5vw;
     }
     .flipSBL {
         left: 0;
@@ -109,11 +127,12 @@
     }
 
     button[id^="incSpace"], [id^="deSpace"] {
+        font-size: 3vh;
+        padding: 3px;
+        margin: 3px;
         background: none;
         border: none;
         color: white;
-        position: relative;
-        bottom: 10px;
     }
 
     `
@@ -156,18 +175,18 @@
     keycodes.setAttribute('style', 'display: none; ');
     keycodes.setAttribute('class', (ddSide === 'flipSBL') ? 'flipKCL' : 'flipKCR')
     keycodes.insertAdjacentHTML("afterbegin", `
-                                <img src='https://placehold.co/175x45/grey/white?text=Scanner+Banner' id='mahlogah'>
+                                <div class="fixedSize"><img src='https://placehold.co/250x55/grey/white?text=Scanner+Banner' id='mahlogah'></div>
                                 <label class= "kclabels">
                                 Enter<br>
-                                <img src="https://i.postimg.cc/3J5Kn6Lg/enter-Key-Thin.png" class='kc' width="60">
+                                <img src="https://i.postimg.cc/3J5Kn6Lg/enter-Key-Thin.png" class='kc'>
                                 </label>
                                 <label class= "kclabels">
                                 Refresh<br>
-                                <img src="https://i.postimg.cc/1z9XMT3W/f5-Key-Thin.png" class='kc' width="60">
+                                <img src="https://i.postimg.cc/1z9XMT3W/f5-Key-Thin.png" class='kc'>
                                 </label>
                                 <label class= "kclabels">
                                 Tab<br>
-                                <img src="https://i.postimg.cc/DfgS47fS/tabkeythin.png" class='kc' width="60">
+                                <img src="https://i.postimg.cc/DfgS47fS/tabkeythin.png" class='kc'>
                                 </label>
                                 `);
     document.body.appendChild(keycodes);
@@ -177,13 +196,15 @@
     dropdown.setAttribute('id', "sbContainer");
     dropdown.setAttribute('class', ddSide);
     dropdown.insertAdjacentHTML("afterbegin", `
+                                <div class="ctrlPanel">
                                 <input type="text"
                                        id="newBarcode"
-                                       maxlength="30"
-                                       placeholder="Type barcode. Press Enter.">
-                                <br>
-                                <button id='clearAll'>Clear</button>
-                                <button id='flip' class='styleSaver'>Flip</button>`);
+                                       maxlength="14"
+                                       placeholder="Type barcode. Press Enter."></div>
+                                <div class="ctrlPanel">
+                                <button id='clearAll' class='styleSaver'>Clear</button>
+                                <button id='flip' class='styleSaver'>Flip</button>
+                                </div>`);
     document.body.appendChild(dropdown);
     console.log(dropdown.getAttribute('class'))
     let flipButton = document.getElementById('flip');
@@ -252,8 +273,8 @@
         if (dupeTest === -1 && text.length <= 30 && text !== '') {
             dropdown.insertAdjacentHTML("beforeend", `
         <div id="barBox-${text}"class="bContainer" title="${text}">
-             <p class="barcodeLabel" id="bl-${text}" hint="${text}">${text}</p>
-             <div><button id='deSpace${text}'>-</button><i class="fas fa-trash-alt" id="delB-${text}"></i>
+             <div class="barcodeLabel"><p id="bl-${text}" hint="${text}" style="margin: 0px; padding: 0px; text-size-adjust: none;">${text}</p><i class="fas fa-trash-alt" id="delB-${text}"></i></div>
+             <div width='100%' class="barcodeLabel">
              <svg id="${text}"
               class="barcode-svg"
               jsbarcode-format="CODE128"
@@ -261,11 +282,12 @@
               jsbarcode-displayvalue="false"
               jsbarcode-linecolor="#30363d"
               jsbarcode-margin="3"
-              jsbarcode-marginleft="24"
+              jsbarcode-marginleft="5"
+              jsbarcode-marginright="5"
               jsbarcode-textmargin="0"
-              jsbarcode-height="20px"
+              jsbarcode-height="20vh"
               jsbarcode-width="1"></svg>
-              <button id='incSpace${text}'>+</button><div>
+              </div><button id='incSpace${text}'>+</button>
         </div>`);
         JsBarcode(".barcode-svg").init();
         blurIt(blurState);
@@ -302,12 +324,17 @@
             nameChange(this);
         });
         document.getElementById(`incSpace${text}`).addEventListener('click', function() {
-            document.getElementById(`barBox-${text}`).style.marginBottom = "75px"
+            let boxSpace = document.getElementById(`barBox-${text}`);
+            if (boxSpace.style.marginTop === "75px") {
+                boxSpace.style.marginTop = "5px";
+                boxSpace.style.marginBottom = "5px";
+                this.innerText = '+';
+            } else {
+                boxSpace.style.marginTop = "75px";
+                boxSpace.style.marginBottom = "75px";
+                this.innerText = '-';
+            }
         });
-        document.getElementById(`deSpace${text}`).addEventListener('click', function() {
-            document.getElementById(`barBox-${text}`).style.marginBottom = "35px";
-        });
-
         var blurMe = document.getElementById(text);
         function updateBlur() {
             blurMe.style.filter = (blurMe.style.filter !== 'blur(5px)') ? 'blur(5px)' : 'none'
