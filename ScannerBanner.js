@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: margin buttons, hover effects are working');
+    console.log('test updates: fix bugs');
 
     var sbStyles = `
 
