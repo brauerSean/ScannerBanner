@@ -156,6 +156,8 @@
     let altNames = GM_getValue('nameChanges', {});
     let ddSide = GM_getValue('ddside') || 'flipSBL';
     let kcSide = GM_getValue('kcside') || 'flipKCL';
+    let spacedOut = GM_getValue('spacedout') || [];
+    console.log(spacedOut);
     var bannerButton = document.createElement('button')
     bannerButton.setAttribute('id', 'bannerButton');
     document.body.appendChild(bannerButton);
@@ -246,6 +248,7 @@
         GM_setValue('ddside', dropdown.getAttribute('class'));
         GM_setValue('kcside', keycodes.getAttribute('class'));
         GM_setValue('nameChanges', altNames);
+        GM_setValue('spacedout', spacedOut);
     }
 
 
@@ -329,10 +332,19 @@
                 boxSpace.style.marginTop = "5px";
                 boxSpace.style.marginBottom = "5px";
                 this.innerText = '+';
+                let minus = spacedOut.indexOf(this.id);
+                spacedOut.splice(minus, 1);
+                console.log(spacedOut);
+                GM_setValue('spacedout', spacedOut);
             } else {
                 boxSpace.style.marginTop = "75px";
                 boxSpace.style.marginBottom = "75px";
                 this.innerText = '-';
+                if (spacedOut.includes(this.id) === false) {
+                    spacedOut.push(this.id);
+                    console.log(spacedOut);
+                    GM_setValue('spacedout', spacedOut);
+                }
             }
         });
         var blurMe = document.getElementById(text);
@@ -381,6 +393,8 @@
         }
         secretSaved = [];
         renameBarcodes(barcodes);
+        respace(barcodes);
+        console.log('called it');
     };
     loadBarcodes();
 
@@ -395,14 +409,16 @@
             };
         });
     };
-    function loadBarcodeSet(a) {
-        if (barcodes.length > 0) {
-            tempClear();
-        } else console.log('Empty');
-        a.forEach(function(b){
-            addBarcode(b);
+    function respace(anArray) {
+        console.log(`respacing now: ${GM_getValue('spacedout')}`)
+        anArray.forEach((bc) => {
+            if (spacedOut.includes(`incSpace${bc}`)) {
+                console.log('found someone in need of space');
+                let spaceMe = document.getElementById(`incSpace${bc}`);
+                spaceMe.click();
+
+            }
         });
-        renameBarcodes(barcodes);
     }
     function handleTabChange(event) {
 
@@ -417,6 +433,8 @@
             keycodes.setAttribute('class', kcSide);
             altNames = GM_getValue('nameChanges')|| {};
             loadBarcodes();
+            spacedOut = GM_getValue('spacedout');
+            console.log(spacedOut);
             bannerState = GM_getValue('canSeeBanner');
             dropdown.style.display = bannerState;
             keycodesVisible = GM_getValue('canSeeKeycodes');
@@ -476,20 +494,21 @@
         if (conDelete) {
         //reset array to empty
             barcodes = [];
-            blurState = [];
-            //altNames = {};
+            blurState = []
+            altNames = {};
+            spacedOut = [];
         //remove all local storage keys and their values
-            /*
+            ///*
             GM_listValues().forEach(function(key) {
                 GM_deleteValue(key);
             })
-            */
+            //*/
             //remove all storage but saved barcodes object and alternate names
-            GM_deleteValue('canSeeBanner');
-            GM_deleteValue('canSeeKeycodes');
+            //GM_deleteValue('canSeeBanner');
+            //GM_deleteValue('canSeeKeycodes');
             //GM_deleteValue('nameChanges');
-            GM_deleteValue('savedArray');
-            GM_deleteValue('bluredCodes');
+            //GM_deleteValue('savedArray');
+            //GM_deleteValue('bluredCodes');
         // Select all barcodes in the banner
             var barBoxes = document.querySelectorAll('[id*="barBox-"]');
         // remove barcodes from banner
