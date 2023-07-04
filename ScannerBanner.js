@@ -406,7 +406,7 @@
         });
     };
     function respace(anArray) {
-        spacedOut = GM_getValue('spacedout');
+        spacedOut = GM_getValue('spacedout') || [];
         anArray.forEach((bc) => {
             if (spacedOut.includes(`incSpace${bc}`)) {
                     let spaceMe = document.getElementById(`incSpace${bc}`);
