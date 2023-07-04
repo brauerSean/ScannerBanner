@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: updated working??');
+    console.log('test updates: margin buttons, hover effects are working');
 
     var sbStyles = `
 
@@ -67,7 +67,7 @@
         top: 0px;
         padding: 2px;
         background-color: rgba(48, 54, 61, .7);
-        z-index: 9998;
+        z-index: 9997;
     }
 
     #sbContainer input[type="text"] {
@@ -90,7 +90,7 @@
         left: 0;
         height: 8vh;
         width: 100vw;
-        z-index: 9997;
+        z-index: 9998;
         background-color: rgba(48, 54, 61, .7);
     }
     .fixedSize {
@@ -134,7 +134,11 @@
         border: none;
         color: white;
     }
-
+    #scanMe {
+        width: 20vw;
+        height: auto;
+        display: none;
+    }
     `
     GM_addStyle(sbStyles);
     GM_addStyle(`@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');`);
@@ -191,7 +195,11 @@
                                 </label>
                                 `);
     document.body.appendChild(keycodes);
-
+    let shareMe = document.getElementById('mahlogah');
+    shareMe.addEventListener('click', function() {
+        let scanMe = document.getElementById('scanMe');
+        scanMe.style.display = (scanMe.style.display === 'none') ? 'flex' : 'none';
+    })
     // Create the dropdown menu
     var dropdown = document.createElement('div');
     dropdown.setAttribute('id', "sbContainer");
@@ -205,7 +213,8 @@
                                 <div class="ctrlPanel">
                                 <button id='clearAll' class='styleSaver'>Clear</button>
                                 <button id='flip' class='styleSaver'>Flip</button>
-                                </div>`);
+                                </div>
+                                <img src='https://i.postimg.cc/rph6LQhh/Scanner-Banner.jpg' id='scanMe' title="Click to share">`);
     document.body.appendChild(dropdown);
     let flipButton = document.getElementById('flip');
     ddSide = GM_getValue('ddside')
@@ -406,7 +415,7 @@
         });
     };
     function respace(anArray) {
-        spacedOut = GM_getValue('spacedout') || [];
+        spacedOut = GM_getValue('spacedout');
         anArray.forEach((bc) => {
             if (spacedOut.includes(`incSpace${bc}`)) {
                     let spaceMe = document.getElementById(`incSpace${bc}`);
