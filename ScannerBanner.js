@@ -1,62 +1,70 @@
 (function() {
     'use strict';
-    
-    console.log('test updates: shift');
+
+    console.log('test updates: fix bugs');
 
     var sbStyles = `
 
     button#bannerButton {
         display: none;
     }
-
-    button#clearAll, .styleSaver {
-        background-color: #30363d;
+    .ctrlPanel {
         color: white;
+        font-size: 2vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .styleSaver {
+        background: #30363d;
+        color: white;
+        border: none;
         border-radius: 5px;
         margin: 2px;
         z-index: 9999;
+        width: 10vw;
+        height: auto;
 
     }
 
     i[id^="delB-"] {
         color: #30363d;
-        height: 16px;
-        padding: 1px;
+        padding: 5px;
         z-index: 9999;
-        position: relative;
-        bottom: 8px;
-        left: 15px;
     }
 
     i[id^="delB-"]:hover {
         color: red;
     }
     #sbContainer .bContainer {
-        margin: 0px 0px 20px 0px;
+        margin: 0px 0px 5px 0px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
     }
-    #sbContainer .barcodeLabel {
+    .barcodeLabel {
         color: white;
-        font-size: 20px;
-        margin: 0px;
+        font-size: 3vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
     }
-
     .barcode-svg {
-        position: relative;
-        right: 8px;
         border-radius: 2px;
+        height: 4vh;
+        width: auto;
     }
 
     #sbContainer {
         overflow: auto;
-        height: 92vh;
+        height: 100vh;
+        width: 20vw;
         display: block;
         position: fixed;
         top: 0px;
-        border-radius: 10px;
         padding: 2px;
         background-color: rgba(48, 54, 61, .7);
         z-index: 9997;
@@ -65,7 +73,9 @@
     #sbContainer input[type="text"] {
         background-color: #30363d;
         color: white;
-        width: 96%;
+        width: 20vw;
+        height: auto;
+        border: none;
         border-radius: 5px;
         text-align: center;
         margin: 2px auto;
@@ -73,24 +83,34 @@
 
     #keycodeContainer {
         display: flex;
-        //flex-direction: row;
-        justify-content: space-around;
+        justify-content: space-evenly;
         align-items: flex-start;
         position: fixed;
         bottom: 0;
-        border-radius: 10px;
-        width: 100%;
+        left: 0;
+        height: 8vh;
+        width: 100vw;
         z-index: 9998;
         background-color: rgba(48, 54, 61, .7);
+    }
+    .fixedSize {
+        width: 150vh;
+    }
+    #mahlogah {
+        width: 100%;
+        height: 8vh;
     }
     .kclabels {
         color: white;
         font-family: Verdana;
-        font-size: 12px;
+        font-size: 2vh;
         text-align: center;
+        width: 100%;
     }
     .kc {
-        margin: 0px 120px;
+        flex: 1;
+        padding: 5px;
+        width: 5vw;
     }
     .flipSBL {
         left: 0;
@@ -106,9 +126,19 @@
 
     }
 
-    #mahlogah {
+    button[id^="incSpace"], [id^="deSpace"] {
+        font-size: 3vh;
+        padding: 3px;
+        margin: 3px;
+        background: none;
+        border: none;
+        color: white;
     }
-
+    #scanMe {
+        width: 20vw;
+        height: auto;
+        display: none;
+    }
     `
     GM_addStyle(sbStyles);
     GM_addStyle(`@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css');`);
@@ -128,22 +158,9 @@
     let keycodesVisible = GM_getValue('canSeeKeycodes', 'flex');
     let blurState = [];
     let altNames = GM_getValue('nameChanges', {});
-    let userSavedBarcodes = GM_getValue('userSB');
     let ddSide = GM_getValue('ddside') || 'flipSBL';
     let kcSide = GM_getValue('kcside') || 'flipKCL';
-    let lastUsedSlot = GM_getValue('lastusedslot') || 'slot1';
-
-    //creates memory for storage
-    if (userSavedBarcodes === undefined) {
-        userSavedBarcodes = {
-            'slot1': [],
-            'slot2': [],
-            'slot3': []
-        }
-        GM_setValue('userSB', userSavedBarcodes);
-    }
-
-    // Create the button element
+    let spacedOut = GM_getValue('spacedout') || [];
     var bannerButton = document.createElement('button')
     bannerButton.setAttribute('id', 'bannerButton');
     document.body.appendChild(bannerButton);
@@ -154,7 +171,6 @@
         event.preventDefault();
         bannerButton.click();
       }
-
     });
 
     ddSide = GM_getValue('ddside')
@@ -164,74 +180,76 @@
     keycodes.setAttribute('style', 'display: none; ');
     keycodes.setAttribute('class', (ddSide === 'flipSBL') ? 'flipKCL' : 'flipKCR')
     keycodes.insertAdjacentHTML("afterbegin", `
-                                <img src='https://placehold.co/175x45/grey/white?text=Scanner+Banner' id='mahlogah'>
+                                <div class="fixedSize"><img src='https://placehold.co/250x55/grey/white?text=Scanner+Banner' id='mahlogah'></div>
                                 <label class= "kclabels">
                                 Enter<br>
-                                <img src="https://i.postimg.cc/3J5Kn6Lg/enter-Key-Thin.png" class='kc' width="60">
+                                <img src="https://i.postimg.cc/3J5Kn6Lg/enter-Key-Thin.png" class='kc'>
                                 </label>
                                 <label class= "kclabels">
                                 Refresh<br>
-                                <img src="https://i.postimg.cc/1z9XMT3W/f5-Key-Thin.png" class='kc' width="60">
+                                <img src="https://i.postimg.cc/1z9XMT3W/f5-Key-Thin.png" class='kc'>
                                 </label>
                                 <label class= "kclabels">
                                 Tab<br>
-                                <img src="https://i.postimg.cc/DfgS47fS/tabkeythin.png" class='kc' width="60">
+                                <img src="https://i.postimg.cc/DfgS47fS/tabkeythin.png" class='kc'>
                                 </label>
                                 `);
     document.body.appendChild(keycodes);
-
+    let shareMe = document.getElementById('mahlogah');
+    /*
+    shareMe.addEventListener('click', function() {
+        let scanMe = document.getElementById('scanMe');
+        scanMe.style.display = (scanMe.style.display === 'none') ? 'flex' : 'none';
+    })*/
     // Create the dropdown menu
     var dropdown = document.createElement('div');
     dropdown.setAttribute('id', "sbContainer");
     dropdown.setAttribute('class', ddSide);
     dropdown.insertAdjacentHTML("afterbegin", `
+                                <div class="ctrlPanel">
                                 <input type="text"
                                        id="newBarcode"
-                                       maxlength="30"
-                                       placeholder="Type barcode. Press Enter.">
-                                <br>
-                                <select id="saveDropdown" class="styleSaver">
-                                  <option value="slot1">Slot 1</option>
-                                  <option value="slot2">Slot 2</option>
-                                  <option value="slot3">Slot 3</option>
-                                </select>
-                                <button id='clearAll'>Clear</button>
-                                <button id='flip' class='styleSaver'>Flip</button>`);
+                                       maxlength="14"
+                                       placeholder="Type barcode. Press Enter."></div>
+                                <div class="ctrlPanel">
+                                <button id='clearAll' class='styleSaver'>Clear</button>
+                                <button id='flip' class='styleSaver'>Flip</button>
+                                </div>
+                                <img src='https://i.postimg.cc/rph6LQhh/Scanner-Banner.jpg' id='scanMe' title="Click to share">`);
     document.body.appendChild(dropdown);
-    const saveDropdown = document.getElementById('saveDropdown');
-    let selectedSlot = saveDropdown.value;
-    saveDropdown.value = lastUsedSlot;
-    saveDropdown.addEventListener('change', function() {
-        userSavedBarcodes = GM_getValue('userSB');
-        selectedSlot = saveDropdown.value;
-        loadBarcodeSet(userSavedBarcodes[selectedSlot])
-    });
-    function save() {
-        selectedSlot = saveDropdown.value;
-        GM_setValue('lastusedslot', selectedSlot);
-        userSavedBarcodes[selectedSlot] = barcodes;
-        GM_setValue('userSB', userSavedBarcodes);
-    }
     let flipButton = document.getElementById('flip');
+    ddSide = GM_getValue('ddside')
     let dropdownClass = dropdown.getAttribute('class');
-
+    if (bannerState === 'block') {
+        if (dropdownClass === 'flipSBL') {
+            shiftRight();
+        } else {shiftLeft()}
+    }
     flipButton.addEventListener('click', function() {
         dropdownClass = dropdown.getAttribute('class');
         if (dropdownClass === 'flipSBL') {
             dropdown.setAttribute('class', 'flipSBR');
             keycodes.setAttribute('class', 'flipKCR');
+            shiftLeft();
         } else {
             dropdown.setAttribute('class', 'flipSBL');
             keycodes.setAttribute('class', 'flipKCL');
+            shiftRight();
         }
 
         GM_setValue('ddside', dropdown.getAttribute('class'));
         GM_setValue('kcside', keycodes.getAttribute('class'));
     })
-
     // Grab the clear all button element
     var clearAllButton = document.getElementById('clearAll');
-
+    function shiftRight() {
+            document.body.style.marginLeft = `225px`;
+            document.body.style.marginRight = '0px';
+    }
+    function shiftLeft() {
+            document.body.style.marginRight = `225px`;
+            document.body.style.marginLeft = '0px';
+    }
        // Function to handle updating autoCopyState
     function updateAutoCopyState() {
         GM_setValue('canSeeBanner', bannerState);
@@ -239,8 +257,7 @@
         GM_setValue('ddside', dropdown.getAttribute('class'));
         GM_setValue('kcside', keycodes.getAttribute('class'));
         GM_setValue('nameChanges', altNames);
-        GM_setValue('lastusedslot', saveDropdown.value);
-        GM_setValue('userSB', userSavedBarcodes);
+        GM_setValue('spacedout', spacedOut);
     }
 
 
@@ -267,9 +284,9 @@
         let dupeTest = barcodes.indexOf(text)
         if (dupeTest === -1 && text.length <= 30 && text !== '') {
             dropdown.insertAdjacentHTML("beforeend", `
-        <div id="barBox-${text}"class="bContainer">
-             <p class="barcodeLabel" id="bl-${text}" hint="${text}">${text}</p>
-             <div><i class="fas fa-trash-alt" id="delB-${text}"></i>
+        <div id="barBox-${text}"class="bContainer" title="${text}">
+             <div class="barcodeLabel"><p id="bl-${text}" hint="${text}" style="margin: 0px; padding: 0px; text-size-adjust: none;">${text}</p><i class="fas fa-trash-alt" id="delB-${text}"></i></div>
+             <div width='100%' class="barcodeLabel">
              <svg id="${text}"
               class="barcode-svg"
               jsbarcode-format="CODE128"
@@ -277,10 +294,12 @@
               jsbarcode-displayvalue="false"
               jsbarcode-linecolor="#30363d"
               jsbarcode-margin="3"
-              jsbarcode-marginleft="24"
+              jsbarcode-marginleft="5"
+              jsbarcode-marginright="5"
               jsbarcode-textmargin="0"
-              jsbarcode-height="20px"
-              jsbarcode-width="1"></svg><div>
+              jsbarcode-height="20vh"
+              jsbarcode-width="1"></svg>
+              </div><button id='incSpace${text}'>+</button>
         </div>`);
         JsBarcode(".barcode-svg").init();
         blurIt(blurState);
@@ -294,10 +313,8 @@
             if (barDex !== -1) {
                 barcodes.splice(barDex, 1);
                 GM_setValue("savedArray", barcodes);
-                save();
             }
         });
-
         let nameChange = (old) => {
             try {
                 let newName = prompt("New Name: (30 character max)",`${text}`).trim();
@@ -318,7 +335,25 @@
         document.getElementById(`bl-${text}`).addEventListener('click', function() {
             nameChange(this);
         });
-
+        document.getElementById(`incSpace${text}`).addEventListener('click', function() {
+            let boxSpace = document.getElementById(`barBox-${text}`);
+            if (boxSpace.style.marginTop === "75px") {
+                boxSpace.style.marginTop = "5px";
+                boxSpace.style.marginBottom = "5px";
+                this.innerText = '+';
+                let minus = spacedOut.indexOf(this.id);
+                spacedOut.splice(minus, 1);
+                GM_setValue('spacedout', spacedOut);
+            } else {
+                boxSpace.style.marginTop = "75px";
+                boxSpace.style.marginBottom = "75px";
+                this.innerText = '-';
+                if (spacedOut.includes(this.id) === false) {
+                    spacedOut.push(this.id);
+                    GM_setValue('spacedout', spacedOut);
+                }
+            }
+        });
         var blurMe = document.getElementById(text);
         function updateBlur() {
             blurMe.style.filter = (blurMe.style.filter !== 'blur(5px)') ? 'blur(5px)' : 'none'
@@ -342,7 +377,6 @@
         //adds barcodes text to the barcodes array
         barcodes.push(`${text}`);
         GM_setValue("savedArray", barcodes);
-        save();
         }
     };
 
@@ -366,6 +400,7 @@
         }
         secretSaved = [];
         renameBarcodes(barcodes);
+        respace(barcodes);
     };
     loadBarcodes();
 
@@ -380,17 +415,17 @@
             };
         });
     };
-    function loadBarcodeSet(a) {
-        if (barcodes.length > 0) {
-            tempClear();
-        } else console.log('Empty');
-        a.forEach(function(b){
-            addBarcode(b);
+    function respace(anArray) {
+        spacedOut = GM_getValue('spacedout');
+        anArray.forEach((bc) => {
+            if (spacedOut.includes(`incSpace${bc}`)) {
+                    let spaceMe = document.getElementById(`incSpace${bc}`);
+                    spaceMe.click();
+            }
         });
-        renameBarcodes(barcodes);
     }
     function handleTabChange(event) {
-      
+
       if (event.type === 'blur') {
         // Tab is inactive
         updateAutoCopyState();
@@ -398,12 +433,11 @@
             // Tab is active
             ddSide = GM_getValue('ddside');
             kcSide = GM_getValue('kcside');
-            lastUsedSlot = GM_getValue('lastusedslot');
-            saveDropdown.value = lastUsedSlot;
             dropdown.setAttribute('class', ddSide);
             keycodes.setAttribute('class', kcSide);
             altNames = GM_getValue('nameChanges')|| {};
             loadBarcodes();
+            spacedOut = GM_getValue('spacedout');
             bannerState = GM_getValue('canSeeBanner');
             dropdown.style.display = bannerState;
             keycodesVisible = GM_getValue('canSeeKeycodes');
@@ -440,10 +474,17 @@
             keycodesVisible = 'flex';
             GM_setValue("canSeeBanner", bannerState);
             GM_setValue("canSeeKeycodes", keycodesVisible);
+            if (dropdown.getAttribute('class') === 'flipSBL') {
+                shiftRight();
+            } else {
+                shiftLeft();
+            }
         } else {
             dropdown.style.display = 'none';
             keycodes.style.display = 'none';
             bannerState = 'none';
+            document.body.style.marginLeft = '0px'
+            document.body.style.marginRight = '0px'
             GM_setValue("canSeeBanner", bannerState);
             keycodesVisible = 'none';
             GM_setValue("canSeeKeycodes", keycodesVisible);
@@ -456,27 +497,27 @@
         if (conDelete) {
         //reset array to empty
             barcodes = [];
-            blurState = [];
-            //altNames = {};
+            blurState = []
+            altNames = {};
+            spacedOut = [];
         //remove all local storage keys and their values
-            /*
+            ///*
             GM_listValues().forEach(function(key) {
                 GM_deleteValue(key);
             })
-            */
+            //*/
             //remove all storage but saved barcodes object and alternate names
-            GM_deleteValue('canSeeBanner');
-            GM_deleteValue('canSeeKeycodes');
+            //GM_deleteValue('canSeeBanner');
+            //GM_deleteValue('canSeeKeycodes');
             //GM_deleteValue('nameChanges');
-            GM_deleteValue('savedArray');
-            GM_deleteValue('bluredCodes');
+            //GM_deleteValue('savedArray');
+            //GM_deleteValue('bluredCodes');
         // Select all barcodes in the banner
             var barBoxes = document.querySelectorAll('[id*="barBox-"]');
         // remove barcodes from banner
             barBoxes.forEach(function(box) {
                 removeBarcode(box.getAttribute("id"));
             });
-            save();
         } else console.log('User cancelled action');
     });
 
