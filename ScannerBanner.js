@@ -196,10 +196,11 @@
                                 `);
     document.body.appendChild(keycodes);
     let shareMe = document.getElementById('mahlogah');
+    /*
     shareMe.addEventListener('click', function() {
         let scanMe = document.getElementById('scanMe');
         scanMe.style.display = (scanMe.style.display === 'none') ? 'flex' : 'none';
-    })
+    })*/
     // Create the dropdown menu
     var dropdown = document.createElement('div');
     dropdown.setAttribute('id', "sbContainer");
