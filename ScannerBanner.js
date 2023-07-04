@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: margin buttons, hover effects');
+    console.log('test updates: margin buttons, hover effects are working');
 
     var sbStyles = `
 
@@ -157,7 +157,6 @@
     let ddSide = GM_getValue('ddside') || 'flipSBL';
     let kcSide = GM_getValue('kcside') || 'flipKCL';
     let spacedOut = GM_getValue('spacedout') || [];
-    console.log(spacedOut);
     var bannerButton = document.createElement('button')
     bannerButton.setAttribute('id', 'bannerButton');
     document.body.appendChild(bannerButton);
@@ -208,8 +207,8 @@
                                 <button id='flip' class='styleSaver'>Flip</button>
                                 </div>`);
     document.body.appendChild(dropdown);
-    console.log(dropdown.getAttribute('class'))
     let flipButton = document.getElementById('flip');
+    ddSide = GM_getValue('ddside')
     let dropdownClass = dropdown.getAttribute('class');
     if (bannerState === 'block') {
         if (dropdownClass === 'flipSBL') {
@@ -334,7 +333,6 @@
                 this.innerText = '+';
                 let minus = spacedOut.indexOf(this.id);
                 spacedOut.splice(minus, 1);
-                console.log(spacedOut);
                 GM_setValue('spacedout', spacedOut);
             } else {
                 boxSpace.style.marginTop = "75px";
@@ -342,7 +340,6 @@
                 this.innerText = '-';
                 if (spacedOut.includes(this.id) === false) {
                     spacedOut.push(this.id);
-                    console.log(spacedOut);
                     GM_setValue('spacedout', spacedOut);
                 }
             }
@@ -394,7 +391,6 @@
         secretSaved = [];
         renameBarcodes(barcodes);
         respace(barcodes);
-        console.log('called it');
     };
     loadBarcodes();
 
@@ -410,13 +406,11 @@
         });
     };
     function respace(anArray) {
-        console.log(`respacing now: ${GM_getValue('spacedout')}`)
+        spacedOut = GM_getValue('spacedout');
         anArray.forEach((bc) => {
             if (spacedOut.includes(`incSpace${bc}`)) {
-                console.log('found someone in need of space');
-                let spaceMe = document.getElementById(`incSpace${bc}`);
-                spaceMe.click();
-
+                    let spaceMe = document.getElementById(`incSpace${bc}`);
+                    spaceMe.click();
             }
         });
     }
@@ -434,7 +428,6 @@
             altNames = GM_getValue('nameChanges')|| {};
             loadBarcodes();
             spacedOut = GM_getValue('spacedout');
-            console.log(spacedOut);
             bannerState = GM_getValue('canSeeBanner');
             dropdown.style.display = bannerState;
             keycodesVisible = GM_getValue('canSeeKeycodes');
