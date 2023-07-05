@@ -160,7 +160,7 @@
     let altNames = GM_getValue('nameChanges', {});
     let ddSide = GM_getValue('ddside') || 'flipSBL';
     let kcSide = GM_getValue('kcside') || 'flipKCL';
-    let spacedOut = [];
+    let spacedOut = GM_getValue('spacedout', []);
     var bannerButton = document.createElement('button')
     bannerButton.setAttribute('id', 'bannerButton');
     document.body.appendChild(bannerButton);
