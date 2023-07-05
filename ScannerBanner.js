@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: still fixing bugs');
+    console.log('test updates: still fixing bugs.');
 
     var sbStyles = `
 
