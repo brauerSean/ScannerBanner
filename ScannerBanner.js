@@ -54,7 +54,7 @@
     }
     .barcode-svg {
         border-radius: 2px;
-        height: 4vh;
+        height: 5vh;
         width: auto;
     }
 
