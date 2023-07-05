@@ -160,7 +160,7 @@
     let altNames = GM_getValue('nameChanges', {});
     let ddSide = GM_getValue('ddside') || 'flipSBL';
     let kcSide = GM_getValue('kcside') || 'flipKCL';
-    let spacedOut = GM_getValue('spacedout') || [];
+    let spacedOut = [];
     var bannerButton = document.createElement('button')
     bannerButton.setAttribute('id', 'bannerButton');
     document.body.appendChild(bannerButton);
@@ -417,12 +417,14 @@
     };
     function respace(anArray) {
         spacedOut = GM_getValue('spacedout');
-        anArray.forEach((bc) => {
-            if (spacedOut.includes(`incSpace${bc}`)) {
-                    let spaceMe = document.getElementById(`incSpace${bc}`);
-                    spaceMe.click();
-            }
-        });
+        if (spacedOut) {
+            anArray.forEach((bc) => {
+                if (spacedOut.includes(`incSpace${bc}`)) {
+                        let spaceMe = document.getElementById(`incSpace${bc}`);
+                        spaceMe.click();
+                }
+            });
+        }
     }
     function handleTabChange(event) {
 
