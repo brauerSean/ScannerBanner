@@ -3,6 +3,7 @@
 // @version      2.0
 // @description  Creates a banner to store your favorite barcodes. Ctrl + Alt shows/hides the banner. Press and hold ` while clicking to auto create barcodes of the text you click on.
 // @author       brausean
+// @contributors luofarme
 // @match        https://*/*
 // @match        http://*/*
 // @grant        GM_listValues
