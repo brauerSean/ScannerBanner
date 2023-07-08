@@ -155,14 +155,14 @@
 */
     function incrementCounter() {
         fetch('https://dev.lucasfarmer.com/visit?visit=true', {
-        method: 'GET'
+            method: 'GET'
         })
         .then(response => {
             if (response.ok) {
-            console.log('Counter incremented');
-            location.reload();
+                console.log('Counter incremented');
+                location.reload();
             } else {
-            console.error('Request failed');
+                console.error('Request failed');
             }
         })
         .catch(error => {
