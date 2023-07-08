@@ -153,22 +153,7 @@
       console.log(`Key: ${key}, Value: ${value}`);
     });}
 */
-    function incrementCounter() {
-        fetch('https://dev.lucasfarmer.com/visit?visit=true', {
-            method: 'GET'
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('Counter incremented');
-                location.reload();
-            } else {
-                console.error('Request failed');
-            }
-        })
-        .catch(error => {
-            console.error(error);
-        });
-    }
+
     let barcodes = [];
     let bannerState = GM_getValue('canSeeBanner', 'block');
     let keycodesVisible = GM_getValue('canSeeKeycodes', 'flex');
@@ -562,21 +547,27 @@
         function handleClick(event) {
             GM_setValue('bluredCodes', blurState);
     }
-    var acPressed = false;
-    document.addEventListener('keydown', function(event) {
-        if (event.keyCode === 17) {
-            acPressed = true;
-        }
-    })
-    document.addEventListener('keyup', function(event) {
-        if (event.keyCode === 17) {
-            acPressed = false;
-        }
-    })
     document.addEventListener('click', function(event) {
-        if (acPressed) {
+        if (event.ctrlKey || event.metaKey) {
             event.preventDefault();
             addBarcode(event.target.innerHTML);
+            incrementCounter();
         }
-    })
+    });
+
+    function incrementCounter() {
+        fetch('https://dev.lucasfarmer.com/savedLabes?lableSaved=true', {
+            method: 'GET'
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Counter incremented');
+            } else {
+                console.error('Request failed');
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
 })();
