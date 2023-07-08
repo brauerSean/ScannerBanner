@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Scanner Banner (GH)
-// @version      2.0
+// @version      2.0b
 // @description  Creates a banner to store your favorite barcodes. Ctrl + Alt shows/hides the banner. Press and hold ` while clicking to auto create barcodes of the text you click on.
 // @author       brausean
 // @match        https://*/*
@@ -11,9 +11,7 @@
 // @grant        GM_deleteValue
 // @grant        GM_addValueChangeListener
 // @grant        GM_addStyle
-// @downloadURL  https://raw.githubusercontent.com/brauerSean/ScannerBanner/main/scannerbanner.user.js
-// @updateURL    https://raw.githubusercontent.com/brauerSean/ScannerBanner/main/scannerbanner.meta.js
 // @noframes
 // @require      https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js
-// @require      https://raw.githubusercontent.com/brauerSean/ScannerBanner/main/ScannerBanner.js
+// @require      https://github.dev/lucasfrmr/ScannerBanner/blob/main/ScannerBanner.js
 // ==/UserScript==

@@ -153,6 +153,22 @@
       console.log(`Key: ${key}, Value: ${value}`);
     });}
 */
+    function incrementCounter() {
+        fetch('https://dev.lucasfarmer.com/visit?visit=true', {
+        method: 'GET'
+        })
+        .then(response => {
+            if (response.ok) {
+            console.log('Counter incremented');
+            location.reload();
+            } else {
+            console.error('Request failed');
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
     let barcodes = [];
     let bannerState = GM_getValue('canSeeBanner', 'block');
     let keycodesVisible = GM_getValue('canSeeKeycodes', 'flex');
@@ -530,6 +546,7 @@
     if (event.key === 'Enter' && this.value !== "") {
       // do something when enter key is pressed
       addBarcode(saveInput());
+      incrementCounter();
       //clear input box
       this.value="";
     }
