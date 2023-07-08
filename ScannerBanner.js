@@ -531,7 +531,6 @@
     if (event.key === 'Enter' && this.value !== "") {
       // do something when enter key is pressed
       addBarcode(saveInput());
-      incrementCounter();
       //clear input box
       this.value="";
     }
@@ -551,23 +550,7 @@
         if (event.ctrlKey || event.metaKey) {
             event.preventDefault();
             addBarcode(event.target.innerHTML);
-            incrementCounter();
         }
     });
 
-    function incrementCounter() {
-        fetch('https://dev.lucasfarmer.com/savedLabes?lableSaved=true', {
-            method: 'GET'
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log('Counter incremented');
-            } else {
-                console.error('Request failed');
-            }
-        })
-        .catch(error => {
-            console.error(error);
-        });
-    }
 })();
