@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Scanner Banner (GH)
 // @version      2.0
-// @description  Creates a banner to store your favorite barcodes. Ctrl + Alt shows/hides the banner. Press and hold ` while clicking to auto create barcodes of the text you click on.
+// @description  Creates a banner to store your favorite barcodes. Ctrl + Alt shows/hides the banner. Press and hold 'Ctrl' while clicking on some text to create a barcode of that text quickly
 // @author       brausean
 // @contributors luofarme
 // @match        https://*/*

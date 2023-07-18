@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: :(');
+    console.log('test updates: margin count');
 
     var sbStyles = `
 
