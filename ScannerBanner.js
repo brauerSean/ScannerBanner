@@ -210,7 +210,7 @@
                                 <div class="ctrlPanel">
                                 <input type="text"
                                        id="newBarcode"
-                                       maxlength="30"
+                                       maxlength="20"
                                        placeholder="Type barcode. Press Enter."></div>
                                 <div class="ctrlPanel">
                                 <button id='clearAll' class='styleSaver'>Clear</button>
