@@ -45,7 +45,7 @@
         justify-content: center;
     }
     .barcodeLabel {
-        color: white;
+        color: #98bd6b;
         font-size: 3vh;
         display: flex;
         align-items: center;
