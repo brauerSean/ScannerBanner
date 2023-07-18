@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: :)');
+    console.log('test updates: :(');
 
     var sbStyles = `
 
@@ -61,7 +61,7 @@
     #sbContainer {
         overflow: auto;
         height: 100vh;
-        width: 20vw;
+        width: auto;
         display: block;
         position: fixed;
         top: 0px;
@@ -196,12 +196,12 @@
                                 `);
     document.body.appendChild(keycodes);
     let shareMe = document.getElementById('mahlogah');
-    
+
     shareMe.addEventListener('click', function() {
         let scanMe = document.getElementById('scanMe');
         scanMe.style.display = (scanMe.style.display === 'none') ? 'flex' : 'none';
     });
-    
+
     // Create the dropdown menu
     var dropdown = document.createElement('div');
     dropdown.setAttribute('id', "sbContainer");
@@ -283,7 +283,7 @@
     //create barcode with delete button. saves to local storage
     function addBarcode(text) {
         let dupeTest = barcodes.indexOf(text)
-        if (dupeTest === -1 && text.length <= 30 && text !== '') {
+        if (dupeTest === -1 && text.length <= 20 && text !== '') {
             dropdown.insertAdjacentHTML("beforeend", `
         <div id="barBox-${text}"class="bContainer" title="${text}">
              <div class="barcodeLabel"><p id="bl-${text}" hint="${text}" style="margin: 0px; padding: 0px; text-size-adjust: none;">${text}</p><i class="fas fa-trash-alt" id="delB-${text}"></i></div>
@@ -438,6 +438,7 @@
             kcSide = GM_getValue('kcside');
             dropdown.setAttribute('class', ddSide);
             keycodes.setAttribute('class', kcSide);
+            document.body.style.margin = '0px';
             altNames = GM_getValue('nameChanges')|| {};
             loadBarcodes();
             spacedOut = GM_getValue('spacedout');
@@ -530,6 +531,7 @@
     if (event.key === 'Enter' && this.value !== "") {
       // do something when enter key is pressed
       addBarcode(saveInput());
+      incrementCounter();
       //clear input box
       this.value="";
     }
@@ -547,10 +549,22 @@
     }
     document.addEventListener('click', function(event) {
         if (event.ctrlKey || event.metaKey) {
+            //option for disabling ctrl click functionality when banner is hidden
             if (bannerState !== 'none') {
                 event.preventDefault();
+                let nothingHappened = barcodes.length;
                 addBarcode(event.target.innerHTML);
+                if (barcodes.length !== nothingHappened) {
+                    incrementCounter();
+                    console.log('counter updated');
+                }
             }
         }
     });
+
+    function incrementCounter() {
+        fetch('https://seanbrauer.com/labelsaved', {
+            method: 'GET'
+        })
+    }
 })();
