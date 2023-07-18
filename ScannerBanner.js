@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: :(');
+    console.log('test updates: :)');
 
     var sbStyles = `
 
@@ -29,7 +29,7 @@
     }
 
     i[id^="delB-"] {
-        color: #30363d;
+        color: white;
         padding: 5px;
         z-index: 9999;
     }
@@ -210,7 +210,7 @@
                                 <div class="ctrlPanel">
                                 <input type="text"
                                        id="newBarcode"
-                                       maxlength="14"
+                                       maxlength="30"
                                        placeholder="Type barcode. Press Enter."></div>
                                 <div class="ctrlPanel">
                                 <button id='clearAll' class='styleSaver'>Clear</button>
@@ -545,21 +545,12 @@
         function handleClick(event) {
             GM_setValue('bluredCodes', blurState);
     }
-    var acPressed = false;
-    document.addEventListener('keydown', function(event) {
-        if (event.keyCode === 17) {
-            acPressed = true;
-        }
-    })
-    document.addEventListener('keyup', function(event) {
-        if (event.keyCode === 17) {
-            acPressed = false;
-        }
-    })
     document.addEventListener('click', function(event) {
-        if (acPressed) {
-            event.preventDefault();
-            addBarcode(event.target.innerHTML);
+        if (event.ctrlKey || event.metaKey) {
+            if (bannerState !== 'none') {
+                event.preventDefault();
+                addBarcode(event.target.innerHTML);
+            }
         }
-    })
+    });
 })();
