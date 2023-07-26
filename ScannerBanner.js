@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: marbin jug test');
+    console.log('test updates: marbin jug test cleanup');
 
     var sbStyles = `
 
@@ -174,8 +174,7 @@
       }
     });
 
-    ddSide = GM_getValue('ddside')
-    console.log(`grabing again for some reason: ${ddSide}`);
+    console.log(f`value before kc creation: ${ddSide}`);
     // Create keycode banner for keyboard key shortcuts
     var keycodes = document.createElement('div');
     keycodes.setAttribute('id', "keycodeContainer");
@@ -220,11 +219,10 @@
                                 <img src='https://i.postimg.cc/rph6LQhh/Scanner-Banner.jpg' id='scanMe' title="Click to share">`);
     document.body.appendChild(dropdown);
     let flipButton = document.getElementById('flip');
-    ddSide = GM_getValue('ddside')
-    console.log(`getting it for a 3rd time: ${ddSide}`);
+    console.log(`after dropdown creation before class setting: ${ddSide}`);
     dropdown.setAttribute('class', ddSide);
     let dropdownClass = dropdown.getAttribute('class');
-    console.log(dropdownClass);
+    console.log(`value of dropdown class ${dropdownClass}`);
     if (bannerState === 'block') {
         if (dropdownClass === 'flipSBL') {
             shiftRight();
