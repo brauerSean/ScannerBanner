@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: marbin jug8');
+    console.log('test updates: marbin jug9');
 
     var sbStyles = `
 
@@ -222,7 +222,7 @@
     ddSide = GM_getValue('ddside')
     let dropdownClass = dropdown.getAttribute('class');
     if (dropdownClass === undefined) {
-        dropdownClass = 'flipSBL';
+        dropdown.setAttribute('class') = 'flipSBL';
         console.log(dropdownClass);
     }
     if (bannerState === 'block') {
