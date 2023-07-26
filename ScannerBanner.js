@@ -221,10 +221,7 @@
     let flipButton = document.getElementById('flip');
     ddSide = GM_getValue('ddside')
     let dropdownClass = dropdown.getAttribute('class');
-    if (dropdownClass === undefined) {
-        dropdown.setAttribute('class', 'flipSBL');
-        console.log(dropdownClass);
-    }
+    console.log(dropdownClass);
     if (bannerState === 'block') {
         if (dropdownClass === 'flipSBL') {
             shiftRight();
