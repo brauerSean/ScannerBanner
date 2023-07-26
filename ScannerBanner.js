@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: MarbinJug Fixed test');
+    console.log('Pardon the dust...');
 
     var sbStyles = `
 
