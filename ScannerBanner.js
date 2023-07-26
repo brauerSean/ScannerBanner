@@ -221,12 +221,13 @@
     let flipButton = document.getElementById('flip');
     ddSide = GM_getValue('ddside')
     let dropdownClass = dropdown.getAttribute('class');
+    if (dropdownClass  === undefined) {dropdownClass = 'flipSBL'}
     console.log(dropdownClass);
-    //if (bannerState === 'block') {
-        //if (dropdownClass === 'flipSBL' || dropdownClass === 'undefined') {
-            //shiftRight();
-        //} else {shiftLeft()}
-    //}
+    if (bannerState === 'block') {
+        if (dropdownClass === 'flipSBL') {
+            shiftRight();
+        } else {shiftLeft()}
+    }
     flipButton.addEventListener('click', function() {
         dropdownClass = dropdown.getAttribute('class');
         if (dropdownClass === 'flipSBL') {
