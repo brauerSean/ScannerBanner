@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: marbin jug4');
+    console.log('test updates: marbin jug5');
 
     var sbStyles = `
 
@@ -222,11 +222,11 @@
     ddSide = GM_getValue('ddside')
     let dropdownClass = dropdown.getAttribute('class');
     console.log(dropdownClass);
-    if (bannerState === 'block') {
-        if (dropdownClass === 'flipSBL' || dropdownClass === 'undefined') {
-            shiftRight();
-        } else {shiftLeft()}
-    }
+    //if (bannerState === 'block') {
+        //if (dropdownClass === 'flipSBL' || dropdownClass === 'undefined') {
+            //shiftRight();
+        //} else {shiftLeft()}
+    //}
     flipButton.addEventListener('click', function() {
         dropdownClass = dropdown.getAttribute('class');
         if (dropdownClass === 'flipSBL') {
