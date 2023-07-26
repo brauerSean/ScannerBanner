@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: marbin jug10');
+    console.log('test updates: marbin jug11');
 
     var sbStyles = `
 
@@ -205,7 +205,7 @@
     // Create the dropdown menu
     var dropdown = document.createElement('div');
     dropdown.setAttribute('id', "sbContainer");
-    dropdown.setAttribute('class', ddSide);
+    dropdown.setAttribute('class', (ddSide === 'flipSBL' || ddSide === undefined) ? 'flipSBL' : 'flipSBR');
     dropdown.insertAdjacentHTML("afterbegin", `
                                 <div class="ctrlPanel">
                                 <input type="text"
