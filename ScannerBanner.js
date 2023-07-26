@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: marbin jug5');
+    console.log('test updates: marbin jug7');
 
     var sbStyles = `
 
