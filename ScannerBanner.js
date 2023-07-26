@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: marbin jug test cleanup1');
+    console.log('test updates: MarbinJug Fixed test');
 
     var sbStyles = `
 
@@ -159,7 +159,6 @@
     let blurState = [];
     let altNames = GM_getValue('nameChanges', {});
     let ddSide = GM_getValue('ddside') || 'flipSBL';
-    console.log(`init value ddSide: ${ddSide}`);
     let kcSide = GM_getValue('kcside') || 'flipKCL';
     let spacedOut = [];
     var bannerButton = document.createElement('button')
@@ -174,7 +173,6 @@
       }
     });
 
-    console.log(`value before kc creation: ${ddSide}`);
     // Create keycode banner for keyboard key shortcuts
     var keycodes = document.createElement('div');
     keycodes.setAttribute('id', "keycodeContainer");
@@ -219,15 +217,9 @@
                                 <img src='https://i.postimg.cc/rph6LQhh/Scanner-Banner.jpg' id='scanMe' title="Click to share">`);
     document.body.appendChild(dropdown);
     let flipButton = document.getElementById('flip');
-    console.log(`after dropdown creation before class setting: ${ddSide}`);
     dropdown.setAttribute('class', ddSide);
     let dropdownClass = dropdown.getAttribute('class');
-    console.log(`value of dropdown class ${dropdownClass}`);
-    if (bannerState === 'block') {
-        if (dropdownClass === 'flipSBL') {
-            shiftRight();
-        } else {shiftLeft()}
-    }
+
     flipButton.addEventListener('click', function() {
         dropdownClass = dropdown.getAttribute('class');
         if (dropdownClass === 'flipSBL') {
@@ -245,13 +237,22 @@
     })
     // Grab the clear all button element
     var clearAllButton = document.getElementById('clearAll');
+    // functions etc
+    function resetMargins () {
+        document.body.style.marginLeft = '0px';
+        document.body.style.marginRight = '0px';
+    }
+    function updateMargins () {
+        document.body.style.marginLeft = (ddSide === 'flipSBL') ? '225px' : '0px';
+        document.body.style.marginRight = (ddSide === 'flipSBL') ? '0px' : '255px';
+    }
     function shiftRight() {
-            document.body.style.marginLeft = `225px`;
-            document.body.style.marginRight = '0px';
+        document.body.style.marginLeft = `225px`;
+        document.body.style.marginRight = '0px';
     }
     function shiftLeft() {
-            document.body.style.marginRight = `225px`;
-            document.body.style.marginLeft = '0px';
+        document.body.style.marginRight = `225px`;
+        document.body.style.marginLeft = '0px';
     }
        // Function to handle updating autoCopyState
     function updateAutoCopyState() {
@@ -437,14 +438,16 @@
         } else if (event.type === 'focus') {
             // Tab is active
             ddSide = GM_getValue('ddside');
-            kcSide = GM_getValue('kcside');
+            console.log(`focus event value: ${ddSide}`);
             dropdown.setAttribute('class', ddSide);
+            kcSide = GM_getValue('kcside');
             keycodes.setAttribute('class', kcSide);
             altNames = GM_getValue('nameChanges')|| {};
             loadBarcodes();
             spacedOut = GM_getValue('spacedout');
             bannerState = GM_getValue('canSeeBanner');
             dropdown.style.display = bannerState;
+            (bannerState === 'none') ? resetMargins() : updateMargins();
             keycodesVisible = GM_getValue('canSeeKeycodes');
             keycodes.style.display = keycodesVisible
             }
@@ -465,10 +468,9 @@
     };
 
     //remembers if the banner is open or closed on page reload
-    dropdown.setAttribute('class', ddSide);
-    keycodes.setAttribute('class', kcSide);
     dropdown.style.display = (bannerState === "block") ? "block" : "none";
     keycodes.style.display = (keycodesVisible === "flex") ? "flex" : "none";
+    (bannerState === 'none') ? resetMargins() : updateMargins();
 
     // Show/Hide the banner on button click
     bannerButton.addEventListener('click', function() {
@@ -488,8 +490,7 @@
             dropdown.style.display = 'none';
             keycodes.style.display = 'none';
             bannerState = 'none';
-            document.body.style.marginLeft = '0px'
-            document.body.style.marginRight = '0px'
+            resetMargins();
             GM_setValue("canSeeBanner", bannerState);
             keycodesVisible = 'none';
             GM_setValue("canSeeKeycodes", keycodesVisible);
