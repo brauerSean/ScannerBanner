@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: marbin jug7');
+    console.log('test updates: marbin jug8');
 
     var sbStyles = `
 
@@ -221,8 +221,10 @@
     let flipButton = document.getElementById('flip');
     ddSide = GM_getValue('ddside')
     let dropdownClass = dropdown.getAttribute('class');
-    if (dropdownClass  === undefined) {dropdownClass = 'flipSBL'}
-    console.log(dropdownClass);
+    if (dropdownClass === undefined) {
+        dropdownClass = 'flipSBL';
+        console.log(dropdownClass);
+    }
     if (bannerState === 'block') {
         if (dropdownClass === 'flipSBL') {
             shiftRight();
