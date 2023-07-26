@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: margin count');
+    console.log('test updates: marbin jug');
 
     var sbStyles = `
 
@@ -221,6 +221,7 @@
     let flipButton = document.getElementById('flip');
     ddSide = GM_getValue('ddside')
     let dropdownClass = dropdown.getAttribute('class');
+    console.log(dropdownClass);
     if (bannerState === 'block') {
         if (dropdownClass === 'flipSBL') {
             shiftRight();
@@ -438,7 +439,6 @@
             kcSide = GM_getValue('kcside');
             dropdown.setAttribute('class', ddSide);
             keycodes.setAttribute('class', kcSide);
-            document.body.style.margin = '0px';
             altNames = GM_getValue('nameChanges')|| {};
             loadBarcodes();
             spacedOut = GM_getValue('spacedout');
