@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: marbin jug test cleanup');
+    console.log('test updates: marbin jug test cleanup1');
 
     var sbStyles = `
 
@@ -174,7 +174,7 @@
       }
     });
 
-    console.log(f`value before kc creation: ${ddSide}`);
+    console.log(`value before kc creation: ${ddSide}`);
     // Create keycode banner for keyboard key shortcuts
     var keycodes = document.createElement('div');
     keycodes.setAttribute('id', "keycodeContainer");
