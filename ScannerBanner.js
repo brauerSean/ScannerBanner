@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('test updates: marbin jug11');
+    console.log('test updates: marbin jug test');
 
     var sbStyles = `
 
@@ -159,6 +159,7 @@
     let blurState = [];
     let altNames = GM_getValue('nameChanges', {});
     let ddSide = GM_getValue('ddside') || 'flipSBL';
+    console.log(`init value ddSide: ${ddSide}`);
     let kcSide = GM_getValue('kcside') || 'flipKCL';
     let spacedOut = [];
     var bannerButton = document.createElement('button')
@@ -174,6 +175,7 @@
     });
 
     ddSide = GM_getValue('ddside')
+    console.log(`grabing again for some reason: ${ddSide}`);
     // Create keycode banner for keyboard key shortcuts
     var keycodes = document.createElement('div');
     keycodes.setAttribute('id', "keycodeContainer");
@@ -219,6 +221,7 @@
     document.body.appendChild(dropdown);
     let flipButton = document.getElementById('flip');
     ddSide = GM_getValue('ddside')
+    console.log(`getting it for a 3rd time: ${ddSide}`);
     dropdown.setAttribute('class', ddSide);
     let dropdownClass = dropdown.getAttribute('class');
     console.log(dropdownClass);
