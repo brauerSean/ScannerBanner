@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('Pardon the dust...');
+    console.log('Pardon the dust, cleaning......');
 
     var sbStyles = `
 
@@ -37,6 +37,10 @@
     i[id^="delB-"]:hover {
         color: red;
     }
+    i[id='helpMe'] {
+        color: #98bd6b;
+        margin: 5px;
+    }
     #sbContainer .bContainer {
         margin: 0px 0px 5px 0px;
         display: flex;
@@ -70,9 +74,15 @@
         z-index: 9997;
     }
 
+    ::placeholder {
+        color:  #98bd6b;
+        opacity: .7;
+    }
+
     #sbContainer input[type="text"] {
         background-color: #30363d;
-        color: white;
+        color: #98bd6b;
+        outline: none;
         width: 20vw;
         height: auto;
         border: none;
@@ -80,7 +90,9 @@
         text-align: center;
         margin: 2px auto;
     }
-
+    #sbContainer input[type="text"]:focus {
+        outline: 2px solid #98bd6b;
+    }
     #keycodeContainer {
         display: flex;
         justify-content: space-evenly;
@@ -214,6 +226,7 @@
                                 <button id='clearAll' class='styleSaver'>Clear</button>
                                 <button id='flip' class='styleSaver'>Flip</button>
                                 </div>
+                                <a href="http://seanbrauer.com/scannerbanner"><i class="fas fa-question-circle" id='helpMe'></i></a>
                                 <img src='https://i.postimg.cc/rph6LQhh/Scanner-Banner.jpg' id='scanMe' title="Click to share">`);
     document.body.appendChild(dropdown);
     let flipButton = document.getElementById('flip');
@@ -468,9 +481,9 @@
     };
 
     //remembers if the banner is open or closed on page reload
+    (bannerState === 'none') ? resetMargins() : updateMargins();
     dropdown.style.display = (bannerState === "block") ? "block" : "none";
     keycodes.style.display = (keycodesVisible === "flex") ? "flex" : "none";
-    (bannerState === 'none') ? resetMargins() : updateMargins();
 
     // Show/Hide the banner on button click
     bannerButton.addEventListener('click', function() {
