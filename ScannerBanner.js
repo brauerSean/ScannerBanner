@@ -205,7 +205,6 @@
     // Create the dropdown menu
     var dropdown = document.createElement('div');
     dropdown.setAttribute('id', "sbContainer");
-    dropdown.setAttribute('class', (ddSide === 'flipSBL' || ddSide === undefined) ? 'flipSBL' : 'flipSBR');
     dropdown.insertAdjacentHTML("afterbegin", `
                                 <div class="ctrlPanel">
                                 <input type="text"
@@ -220,6 +219,7 @@
     document.body.appendChild(dropdown);
     let flipButton = document.getElementById('flip');
     ddSide = GM_getValue('ddside')
+    dropdown.setAttribute('class', ddSide);
     let dropdownClass = dropdown.getAttribute('class');
     console.log(dropdownClass);
     if (bannerState === 'block') {
