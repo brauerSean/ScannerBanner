@@ -223,7 +223,7 @@
     let dropdownClass = dropdown.getAttribute('class');
     console.log(dropdownClass);
     if (bannerState === 'block') {
-        if (dropdownClass === 'flipSBL' || 'undefined') {
+        if (dropdownClass === 'flipSBL' || dropdownClass === undefined) {
             shiftRight();
         } else {shiftLeft()}
     }
