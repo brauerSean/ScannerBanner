@@ -74,7 +74,7 @@
         z-index: 9997;
     }
 
-    ::placeholder {
+    input[id='newBarcode']::placeholder {
         color:  #98bd6b;
         opacity: .7;
     }
