@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    console.log('Pardon the dust, cleaning......');
+    console.log('Pardon the dust, cleaning the place');
 
     var sbStyles = `
 
